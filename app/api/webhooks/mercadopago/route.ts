@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { PaymentStatus, Prisma } from "@prisma/client";
+import { env } from "@/lib/env";
 import { mpPaymentClient } from "@/lib/mercadopago";
 import { mapMercadoPagoStatus, mapReservationStatusFromPayment } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +10,8 @@ type MercadoPagoWebhookPayload = {
   id?: number;
   action?: string;
   type?: string;
+  topic?: string;
+  resource?: string;
   live_mode?: boolean;
   data?: {
     id?: string;
@@ -32,7 +35,8 @@ export async function POST(request: Request) {
   const url = new URL(request.url);
   const rawBody = await request.text();
   const payload = (rawBody ? JSON.parse(rawBody) : {}) as MercadoPagoWebhookPayload;
-  const eventType = payload.type ?? url.searchParams.get("topic") ?? "unknown";
+  const eventType =
+    payload.type ?? payload.topic ?? url.searchParams.get("topic") ?? "unknown";
   const eventId = parseEventIdFromRequest(payload, url);
 
   if (!eventId) {
@@ -71,7 +75,37 @@ export async function POST(request: Request) {
   });
 
   try {
-    const mpPayment = await mpPaymentClient.get({ id: eventId });
+    let paymentIdForLookup = eventId;
+
+    if (eventType === "merchant_order" && payload.resource) {
+      const merchantOrderResponse = await fetch(payload.resource, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${env.MERCADOPAGO_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!merchantOrderResponse.ok) {
+        throw new Error(
+          `merchant_order lookup failed (${merchantOrderResponse.status})`,
+        );
+      }
+
+      const merchantOrder = (await merchantOrderResponse.json()) as {
+        payments?: Array<{ id?: number | string }>;
+      };
+
+      const firstPaymentId = merchantOrder.payments?.[0]?.id;
+
+      if (!firstPaymentId) {
+        throw new Error("merchant_order sin payments asociadas");
+      }
+
+      paymentIdForLookup = String(firstPaymentId);
+    }
+
+    const mpPayment = await mpPaymentClient.get({ id: paymentIdForLookup });
     const mappedStatus = mapMercadoPagoStatus(mpPayment.status);
 
     const payment = await prisma.payment.upsert({
@@ -130,11 +164,18 @@ export async function POST(request: Request) {
       paymentStatus: mappedStatus,
     });
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : typeof error === "string"
+          ? error
+          : JSON.stringify(error);
+
     await prisma.paymentEventLog.update({
       where: { id: eventLog.id },
       data: {
         processingState: "failed",
-        processingError: error instanceof Error ? error.message : "unknown",
+        processingError: errorMessage,
       },
     });
 
