@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { PaymentStatus, Prisma } from "@/app/generated/prisma/client";
+import { PaymentStatus, Prisma } from "@prisma/client";
 import { env } from "@/lib/env";
 import { mpPreferenceClient } from "@/lib/mercadopago";
 import { prisma } from "@/lib/prisma";

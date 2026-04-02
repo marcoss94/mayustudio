@@ -1,4 +1,4 @@
-import { PaymentStatus, ReservationStatus } from "@/app/generated/prisma/client";
+import { PaymentStatus, ReservationStatus } from "@prisma/client";
 
 export function mapMercadoPagoStatus(status?: string | null): PaymentStatus {
   switch (status) {

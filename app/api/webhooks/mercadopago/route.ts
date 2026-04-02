@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { PaymentStatus, Prisma } from "@/app/generated/prisma/client";
+import { PaymentStatus, Prisma } from "@prisma/client";
 import { mpPaymentClient } from "@/lib/mercadopago";
 import { mapMercadoPagoStatus, mapReservationStatusFromPayment } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
