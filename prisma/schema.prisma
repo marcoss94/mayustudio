@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReservationStatus {
+  draft
+  pending_payment
+  payment_processing
+  confirmed
+  cancelled
+  expired
+  completed
+}
+
+enum PaymentProvider {
+  mercadopago
+}
+
+enum PaymentStatus {
+  pending
+  approved
+  authorized
+  in_process
+  rejected
+  cancelled
+  refunded
+  chargeback
+  unknown
+}
+
+model Reservation {
+  id                String            @id @default(cuid())
+  externalReference String            @unique
+  status            ReservationStatus @default(pending_payment)
+  totalAmount       Decimal           @db.Decimal(10, 2)
+  currency          String            @default("ARS")
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  payments          Payment[]
+}
+
+model Payment {
+  id                   String          @id @default(cuid())
+  provider             PaymentProvider @default(mercadopago)
+  providerPaymentId    String?         @unique
+  providerPreferenceId String?         @unique
+  externalReference    String?
+  amount               Decimal?        @db.Decimal(10, 2)
+  status               PaymentStatus   @default(pending)
+  statusDetail         String?
+  rawLatestPayload     Json?
+  reservationId        String?
+  reservation          Reservation?    @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  events               PaymentEventLog[]
+
+  @@index([externalReference])
+  @@index([status])
+}
+
+model PaymentEventLog {
+  id              String          @id @default(cuid())
+  provider        PaymentProvider @default(mercadopago)
+  providerEventId String
+  eventType       String?
+  action          String?
+  liveMode        Boolean?
+  payload         Json
+  headers         Json?
+  processingState String          @default("received")
+  processingError String?
+  processedAt     DateTime?
+  createdAt       DateTime        @default(now())
+  paymentId       String?
+  payment         Payment?        @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, providerEventId])
+  @@index([eventType])
+  @@index([createdAt])
+}
