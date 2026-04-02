@@ -15,6 +15,8 @@ Copiar `.env.example` a `.env` y completar:
 - `MERCADOPAGO_ACCESS_TOKEN` (sandbox)
 - `NEXT_PUBLIC_APP_URL` (por defecto `http://localhost:3000`)
 - `MERCADOPAGO_WEBHOOK_URL` (URL pública al endpoint `/api/webhooks/mercadopago`)
+- `MERCADOPAGO_WEBHOOK_SECRET` (clave secreta de Webhooks en panel de MP)
+- `INTERNAL_API_TOKEN` (token interno para endpoints administrativos de pago)
 
 ## Comandos
 
@@ -29,8 +31,8 @@ npm run dev
 
 - `POST /api/payments/mercadopago/preference`
 - `POST /api/webhooks/mercadopago`
-- `GET /api/webhooks/mercadopago?payment_id=...` (reconciliación manual)
-- `GET /api/payments/:id/status`
+- `GET /api/webhooks/mercadopago?payment_id=...` (reconciliación manual, requiere header `x-internal-api-token`)
+- `GET /api/payments/:id/status` (requiere header `x-internal-api-token`)
 
 ## Flujo de prueba
 
@@ -43,3 +45,11 @@ npm run dev
 
 La redirección (`success/pending/failure`) es solo experiencia de usuario.
 La **confirmación real** del pago depende del webhook y conciliación backend.
+
+## Hardening de seguridad aplicado
+
+- Validación opcional de firma `x-signature` (obligatoria si configuras `MERCADOPAGO_WEBHOOK_SECRET`)
+- Validación de host confiable para `merchant_order.resource` (mitiga SSRF)
+- Sanitización de headers persistidos en logs
+- Rate limiting básico en endpoints de pagos/webhooks
+- Endpoints de estado y reconciliación protegidos con `x-internal-api-token`

@@ -5,6 +5,7 @@ import { PaymentStatus, Prisma } from "@prisma/client";
 import { env } from "@/lib/env";
 import { mpPreferenceClient } from "@/lib/mercadopago";
 import { prisma } from "@/lib/prisma";
+import { enforceRateLimit, getClientIp } from "@/lib/security";
 
 const createPreferenceSchema = z.object({
   title: z.string().min(3).default("Reserva estudio fotográfico"),
@@ -15,6 +16,23 @@ const createPreferenceSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const clientIp = getClientIp(request.headers);
+  const rateLimit = enforceRateLimit({
+    key: `preference:${clientIp}`,
+    limit: 20,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes. Intenta nuevamente en unos segundos." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      },
+    );
+  }
+
   try {
     const payload = createPreferenceSchema.parse(await request.json());
 
@@ -35,6 +53,9 @@ export async function POST(request: Request) {
       );
     }
 
+    const effectiveAmount = Number(reservation.totalAmount);
+    const effectiveCurrency = reservation.currency;
+
     const response = await mpPreferenceClient.create({
       body: {
         external_reference: reservation.externalReference,
@@ -45,8 +66,8 @@ export async function POST(request: Request) {
             id: reservation.id,
             title: payload.title,
             quantity: 1,
-            unit_price: payload.amount,
-            currency_id: payload.currency,
+            unit_price: effectiveAmount,
+            currency_id: effectiveCurrency,
           },
         ],
         back_urls: {
@@ -63,7 +84,7 @@ export async function POST(request: Request) {
         reservationId: reservation.id,
         externalReference: reservation.externalReference,
         providerPreferenceId: response.id,
-        amount: payload.amount,
+        amount: effectiveAmount,
         status: PaymentStatus.pending,
         rawLatestPayload: JSON.parse(
           JSON.stringify(response),
@@ -74,6 +95,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       reservationId: reservation.id,
       paymentId: payment.id,
+      amount: effectiveAmount,
+      currency: effectiveCurrency,
       preferenceId: response.id,
       checkoutUrl: response.init_point,
       checkoutSandboxUrl: response.sandbox_init_point,
@@ -89,7 +112,6 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: "No se pudo crear la preferencia de pago",
-        details: error instanceof Error ? error.message : "Error desconocido",
       },
       { status: 500 },
     );

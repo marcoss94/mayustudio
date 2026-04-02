@@ -5,6 +5,13 @@ import { env } from "@/lib/env";
 import { mpPaymentClient } from "@/lib/mercadopago";
 import { mapMercadoPagoStatus, mapReservationStatusFromPayment } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
+import {
+  enforceRateLimit,
+  getClientIp,
+  isTrustedMercadoPagoResourceUrl,
+  sanitizeWebhookHeaders,
+  validateMercadoPagoWebhookSignature,
+} from "@/lib/security";
 
 type MercadoPagoWebhookPayload = {
   id?: number;
@@ -33,8 +40,52 @@ function parseEventIdFromRequest(
 
 export async function POST(request: Request) {
   const url = new URL(request.url);
+  const clientIp = getClientIp(request.headers);
+  const rateLimit = enforceRateLimit({
+    key: `mp-webhook:${clientIp}`,
+    limit: 120,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Rate limit excedido" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      },
+    );
+  }
+
   const rawBody = await request.text();
-  const payload = (rawBody ? JSON.parse(rawBody) : {}) as MercadoPagoWebhookPayload;
+  let payload: MercadoPagoWebhookPayload = {};
+  try {
+    payload = (rawBody ? JSON.parse(rawBody) : {}) as MercadoPagoWebhookPayload;
+  } catch {
+    return NextResponse.json({ error: "Webhook payload inválido" }, { status: 400 });
+  }
+
+  const queryDataId = url.searchParams.get("data.id") ?? undefined;
+  const requestIdHeader = request.headers.get("x-request-id");
+  const signatureHeader = request.headers.get("x-signature");
+
+  if (env.MERCADOPAGO_WEBHOOK_SECRET) {
+    if (!signatureHeader) {
+      return NextResponse.json({ error: "Falta x-signature" }, { status: 401 });
+    }
+
+    const isValidSignature = validateMercadoPagoWebhookSignature({
+      signatureHeader,
+      requestIdHeader,
+      dataId: queryDataId ?? payload.data?.id,
+      secret: env.MERCADOPAGO_WEBHOOK_SECRET,
+    });
+
+    if (!isValidSignature) {
+      return NextResponse.json({ error: "Firma de webhook inválida" }, { status: 401 });
+    }
+  }
+
   const eventType =
     payload.type ?? payload.topic ?? url.searchParams.get("topic") ?? "unknown";
   const eventId = parseEventIdFromRequest(payload, url);
@@ -47,7 +98,7 @@ export async function POST(request: Request) {
   }
 
   const providerEventId = `${eventType}:${eventId}`;
-  const headers = Object.fromEntries(request.headers.entries());
+  const headers = sanitizeWebhookHeaders(request.headers);
 
   const existingEvent = await prisma.paymentEventLog.findUnique({
     where: {
@@ -78,13 +129,21 @@ export async function POST(request: Request) {
     let paymentIdForLookup = eventId;
 
     if (eventType === "merchant_order" && payload.resource) {
+      if (!isTrustedMercadoPagoResourceUrl(payload.resource)) {
+        throw new Error("resource URL no confiable");
+      }
+
+      const abortController = new AbortController();
+      const timeout = setTimeout(() => abortController.abort(), 10_000);
       const merchantOrderResponse = await fetch(payload.resource, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${env.MERCADOPAGO_ACCESS_TOKEN}`,
           "Content-Type": "application/json",
         },
+        signal: abortController.signal,
       });
+      clearTimeout(timeout);
 
       if (!merchantOrderResponse.ok) {
         throw new Error(
@@ -191,6 +250,28 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const token = request.headers.get("x-internal-api-token");
+  if (!env.INTERNAL_API_TOKEN || token !== env.INTERNAL_API_TOKEN) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  const clientIp = getClientIp(request.headers);
+  const rateLimit = enforceRateLimit({
+    key: `mp-reconcile:${clientIp}`,
+    limit: 30,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Rate limit excedido" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      },
+    );
+  }
+
   const url = new URL(request.url);
   const paymentId = url.searchParams.get("payment_id");
 
