@@ -38,6 +38,7 @@ export async function POST(request: Request) {
     const response = await mpPreferenceClient.create({
       body: {
         external_reference: reservation.externalReference,
+        notification_url: env.MERCADOPAGO_WEBHOOK_URL,
         payer: payload.payerEmail ? { email: payload.payerEmail } : undefined,
         items: [
           {

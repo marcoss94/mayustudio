@@ -6,10 +6,12 @@ const serverEnvSchema = z.object({
     .string()
     .min(1, "MERCADOPAGO_ACCESS_TOKEN es requerida"),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  MERCADOPAGO_WEBHOOK_URL: z.string().url().optional(),
 });
 
 export const env = serverEnvSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
   MERCADOPAGO_ACCESS_TOKEN: process.env.MERCADOPAGO_ACCESS_TOKEN,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  MERCADOPAGO_WEBHOOK_URL: process.env.MERCADOPAGO_WEBHOOK_URL,
 });

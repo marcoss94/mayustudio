@@ -14,6 +14,7 @@ Copiar `.env.example` a `.env` y completar:
 - `DATABASE_URL`
 - `MERCADOPAGO_ACCESS_TOKEN` (sandbox)
 - `NEXT_PUBLIC_APP_URL` (por defecto `http://localhost:3000`)
+- `MERCADOPAGO_WEBHOOK_URL` (URL pública al endpoint `/api/webhooks/mercadopago`)
 
 ## Comandos
 
