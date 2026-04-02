@@ -11,7 +11,7 @@ type PreferenceResponse = {
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState("1000");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("test_user_123456@testuser.com");
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -26,7 +26,7 @@ export default function Home() {
         body: JSON.stringify({
           amount: Number(amount),
           title: "Reserva de prueba Mayu Studio",
-          payerEmail: email || undefined,
+          payerEmail: email,
         }),
       });
 
@@ -79,15 +79,19 @@ export default function Home() {
 
         <div className="space-y-1">
           <label htmlFor="email" className="text-sm font-medium">
-            Email del pagador (opcional)
+            Email del pagador de prueba (obligatorio)
           </label>
           <input
             id="email"
             type="email"
+            required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="w-full rounded-md border px-3 py-2"
           />
+          <p className="text-xs text-zinc-500">
+            Usa el email del buyer de prueba que está logueado en Checkout Pro.
+          </p>
         </div>
 
         {error ? <p className="text-sm text-red-600">{error}</p> : null}

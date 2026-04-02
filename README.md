@@ -37,7 +37,7 @@ npm run dev
 ## Flujo de prueba
 
 1. Abrir `http://localhost:3000`
-2. Crear pago de prueba
+2. Crear pago de prueba (email del buyer de prueba obligatorio)
 3. Completar checkout sandbox
 4. Verificar actualización vía webhook en base de datos
 
