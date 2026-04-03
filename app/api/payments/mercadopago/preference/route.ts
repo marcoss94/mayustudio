@@ -10,7 +10,7 @@ import { enforceRateLimit, getClientIp } from "@/lib/security";
 const createPreferenceSchema = z.object({
   title: z.string().min(3).default("Reserva estudio fotográfico"),
   amount: z.number().positive(),
-  currency: z.string().default("ARS"),
+  currency: z.string().default("UYU"),
   payerEmail: z.string().email(),
   reservationId: z.string().optional(),
 });

@@ -64,7 +64,7 @@ export default function Home() {
       <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-2xl border p-6">
         <div className="space-y-1">
           <label htmlFor="amount" className="text-sm font-medium">
-            Monto (ARS)
+            Monto (UYU)
           </label>
           <input
             id="amount"

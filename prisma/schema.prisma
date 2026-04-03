@@ -43,7 +43,7 @@ model Reservation {
   externalReference String            @unique
   status            ReservationStatus @default(pending_payment)
   totalAmount       Decimal           @db.Decimal(10, 2)
-  currency          String            @default("ARS")
+  currency          String            @default("UYU")
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   payments          Payment[]
