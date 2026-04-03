@@ -12,6 +12,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState("1000");
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("Comprador");
+  const [lastName, setLastName] = useState("Prueba");
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -27,6 +29,8 @@ export default function Home() {
           amount: Number(amount),
           title: "Reserva de prueba Mayu Studio",
           payerEmail: email || undefined,
+          payerFirstName: firstName || undefined,
+          payerLastName: lastName || undefined,
         }),
       });
 
@@ -73,6 +77,32 @@ export default function Home() {
             required
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
+            className="w-full rounded-md border px-3 py-2"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="firstName" className="text-sm font-medium">
+            Nombre comprador (opcional)
+          </label>
+          <input
+            id="firstName"
+            type="text"
+            value={firstName}
+            onChange={(event) => setFirstName(event.target.value)}
+            className="w-full rounded-md border px-3 py-2"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="lastName" className="text-sm font-medium">
+            Apellido comprador (opcional)
+          </label>
+          <input
+            id="lastName"
+            type="text"
+            value={lastName}
+            onChange={(event) => setLastName(event.target.value)}
             className="w-full rounded-md border px-3 py-2"
           />
         </div>

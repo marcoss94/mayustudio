@@ -12,6 +12,8 @@ const createPreferenceSchema = z.object({
   amount: z.number().positive(),
   currency: z.string().default("UYU"),
   payerEmail: z.string().email().optional(),
+  payerFirstName: z.string().min(2).max(80).optional(),
+  payerLastName: z.string().min(2).max(80).optional(),
   reservationId: z.string().optional(),
 });
 
@@ -60,16 +62,31 @@ export async function POST(request: Request) {
       body: {
         external_reference: reservation.externalReference,
         notification_url: env.MERCADOPAGO_WEBHOOK_URL,
-        payer: payload.payerEmail ? { email: payload.payerEmail } : undefined,
+        statement_descriptor: "MAYUSTUDIO",
+        binary_mode: true,
+        payer:
+          payload.payerEmail || payload.payerFirstName || payload.payerLastName
+            ? {
+                email: payload.payerEmail,
+                name: payload.payerFirstName,
+                surname: payload.payerLastName,
+              }
+            : undefined,
         items: [
           {
             id: reservation.id,
+            category_id: "services",
+            description: "Reserva de sesión fotográfica infantil",
             title: payload.title,
             quantity: 1,
             unit_price: effectiveAmount,
             currency_id: effectiveCurrency,
           },
         ],
+        payment_methods: {
+          excluded_payment_methods: [],
+          excluded_payment_types: [],
+        },
         back_urls: {
           success: `${env.NEXT_PUBLIC_APP_URL}/pago/success`,
           pending: `${env.NEXT_PUBLIC_APP_URL}/pago/pending`,
