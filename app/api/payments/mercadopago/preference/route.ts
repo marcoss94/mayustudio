@@ -11,7 +11,7 @@ const createPreferenceSchema = z.object({
   title: z.string().min(3).default("Reserva estudio fotográfico"),
   amount: z.number().positive(),
   currency: z.string().default("UYU"),
-  payerEmail: z.string().email(),
+  payerEmail: z.string().email().optional(),
   reservationId: z.string().optional(),
 });
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       body: {
         external_reference: reservation.externalReference,
         notification_url: env.MERCADOPAGO_WEBHOOK_URL,
-        payer: { email: payload.payerEmail },
+        payer: payload.payerEmail ? { email: payload.payerEmail } : undefined,
         items: [
           {
             id: reservation.id,
