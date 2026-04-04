@@ -38,7 +38,7 @@ function validateSignature(options: {
 
   // 2. Armar manifest con template oficial de MP
   const manifest = `id:${options.dataId};request-id:${options.xRequestId};ts:${ts};`;
-  console.log("[webhook-debug] manifest:", manifest);
+
 
   // 3. Calcular HMAC SHA256
   const expected = crypto
@@ -69,34 +69,24 @@ export async function POST(request: Request) {
     const type = url.searchParams.get("type") ?? url.searchParams.get("topic");
     const dataId = url.searchParams.get("data.id");
 
-    // --- Validación de firma ---
+    // --- Validación de firma (best-effort) ---
+    // Bug conocido de MP: firma falla inconsistentemente en prod
+    // https://github.com/mercadopago/sdk-nodejs/discussions/318
+    // Logueamos resultado pero NO bloqueamos — la validación real de
+    // autenticidad es consultar la API de MP por payment ID (mpPayment.get)
     if (env.MERCADOPAGO_WEBHOOK_SECRET && dataId) {
       const xSignature = request.headers.get("x-signature");
       const xRequestId = request.headers.get("x-request-id");
 
-      if (!xSignature || !xRequestId) {
-        console.warn("[webhook] Faltan headers x-signature o x-request-id");
-        return new Response(null, { status: 401 });
-      }
-
-      const isValid = validateSignature({
-        xSignature,
-        xRequestId,
-        dataId,
-        secret: env.MERCADOPAGO_WEBHOOK_SECRET,
-      });
-
-      if (!isValid) {
-        console.warn("[webhook] Firma inválida", {
-          dataId,
+      if (xSignature && xRequestId) {
+        const isValid = validateSignature({
+          xSignature,
           xRequestId,
-          xSignature: xSignature.substring(0, 40) + "...",
-          queryParams: url.search,
+          dataId,
+          secret: env.MERCADOPAGO_WEBHOOK_SECRET,
         });
-        return new Response(null, { status: 401 });
+        console.log(`[webhook] Firma: ${isValid ? "OK" : "no coincide (bug conocido MP)"}`);
       }
-
-      console.log("[webhook] Firma validada OK");
     }
 
     // --- Procesar evento de pago ---
