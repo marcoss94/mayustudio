@@ -2,18 +2,9 @@
 
 import { FormEvent, useState } from "react";
 
-type PreferenceResponse = {
-  paymentId: string;
-  checkoutUrl?: string;
-  checkoutSandboxUrl?: string;
-};
-
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [amount, setAmount] = useState("1000");
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("Comprador");
-  const [lastName, setLastName] = useState("Prueba");
+  const [amount, setAmount] = useState("500");
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -28,13 +19,12 @@ export default function Home() {
         body: JSON.stringify({
           amount: Number(amount),
           title: "Reserva de prueba Mayu Studio",
-          payerEmail: email || undefined,
-          payerFirstName: firstName || undefined,
-          payerLastName: lastName || undefined,
         }),
       });
 
-      const data = (await response.json()) as PreferenceResponse & {
+      const data = (await response.json()) as {
+        init_point?: string;
+        sandbox_init_point?: string;
         error?: string;
       };
 
@@ -43,7 +33,7 @@ export default function Home() {
         return;
       }
 
-      const checkoutUrl = data.checkoutSandboxUrl ?? data.checkoutUrl;
+      const checkoutUrl = data.sandbox_init_point ?? data.init_point;
 
       if (!checkoutUrl) {
         setError("Mercado Pago no devolvió URL de checkout");
@@ -59,10 +49,10 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center px-6 py-10">
-      <h1 className="text-3xl font-semibold">Spike de pagos · Mercado Pago Sandbox</h1>
+    <main className="mx-auto flex min-h-screen w-full max-w-xl flex-col justify-center px-6 py-10">
+      <h1 className="text-3xl font-semibold">Mayu Studio · Pago Sandbox</h1>
       <p className="mt-3 text-sm text-zinc-600">
-        Esta pantalla es solo para validar flujo preference → checkout → webhook.
+        Flujo simple: preference → checkout → webhook → DB.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-2xl border p-6">
@@ -76,52 +66,9 @@ export default function Home() {
             min="1"
             required
             value={amount}
-            onChange={(event) => setAmount(event.target.value)}
+            onChange={(e) => setAmount(e.target.value)}
             className="w-full rounded-md border px-3 py-2"
           />
-        </div>
-
-        <div className="space-y-1">
-          <label htmlFor="firstName" className="text-sm font-medium">
-            Nombre comprador (opcional)
-          </label>
-          <input
-            id="firstName"
-            type="text"
-            value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
-            className="w-full rounded-md border px-3 py-2"
-          />
-        </div>
-
-        <div className="space-y-1">
-          <label htmlFor="lastName" className="text-sm font-medium">
-            Apellido comprador (opcional)
-          </label>
-          <input
-            id="lastName"
-            type="text"
-            value={lastName}
-            onChange={(event) => setLastName(event.target.value)}
-            className="w-full rounded-md border px-3 py-2"
-          />
-        </div>
-
-        <div className="space-y-1">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email del pagador de prueba (opcional)
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded-md border px-3 py-2"
-          />
-          <p className="text-xs text-zinc-500">
-            Si no conoces el email del buyer, déjalo vacío y loguéate en Checkout con el
-            usuario de prueba (TESTUSER...).
-          </p>
         </div>
 
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -129,9 +76,9 @@ export default function Home() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-black px-4 py-2 text-white disabled:opacity-60"
+          className="w-full rounded-md bg-black px-4 py-2 text-white disabled:opacity-60"
         >
-          {loading ? "Creando preferencia..." : "Pagar en sandbox"}
+          {loading ? "Creando preferencia..." : "Pagar con Mercado Pago"}
         </button>
       </form>
     </main>

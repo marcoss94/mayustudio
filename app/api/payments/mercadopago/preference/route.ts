@@ -1,92 +1,42 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 
-import { PaymentStatus, Prisma } from "@prisma/client";
 import { env } from "@/lib/env";
-import { mpPreferenceClient } from "@/lib/mercadopago";
+import { mpPreference } from "@/lib/mercadopago";
 import { prisma } from "@/lib/prisma";
-import { enforceRateLimit, getClientIp } from "@/lib/security";
-
-const createPreferenceSchema = z.object({
-  title: z.string().min(3).default("Reserva estudio fotográfico"),
-  amount: z.number().positive(),
-  currency: z.string().default("UYU"),
-  payerEmail: z.string().email().optional(),
-  payerFirstName: z.string().min(2).max(80).optional(),
-  payerLastName: z.string().min(2).max(80).optional(),
-  reservationId: z.string().optional(),
-});
 
 export async function POST(request: Request) {
-  const clientIp = getClientIp(request.headers);
-  const rateLimit = enforceRateLimit({
-    key: `preference:${clientIp}`,
-    limit: 20,
-    windowMs: 60_000,
-  });
-
-  if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Demasiadas solicitudes. Intenta nuevamente en unos segundos." },
-      {
-        status: 429,
-        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-      },
-    );
-  }
-
   try {
-    const payload = createPreferenceSchema.parse(await request.json());
+    const body = (await request.json()) as {
+      title?: string;
+      amount?: number;
+    };
 
-    const reservation = payload.reservationId
-      ? await prisma.reservation.findUnique({ where: { id: payload.reservationId } })
-      : await prisma.reservation.create({
-          data: {
-            externalReference: crypto.randomUUID(),
-            totalAmount: payload.amount,
-            currency: payload.currency,
-          },
-        });
+    const amount = body.amount ?? 1000;
+    const title = body.title ?? "Reserva Mayu Studio";
 
-    if (!reservation) {
-      return NextResponse.json(
-        { error: "No se encontró la reserva indicada" },
-        { status: 404 },
-      );
-    }
+    // 1. Crear reserva en DB
+    const reservation = await prisma.reservation.create({
+      data: {
+        externalReference: crypto.randomUUID(),
+        totalAmount: amount,
+        currency: "UYU",
+      },
+    });
 
-    const effectiveAmount = Number(reservation.totalAmount);
-    const effectiveCurrency = reservation.currency;
-
-    const response = await mpPreferenceClient.create({
+    // 2. Crear preference en Mercado Pago (patrón Fazt adaptado a SDK v2)
+    const preference = await mpPreference.create({
       body: {
         external_reference: reservation.externalReference,
-        notification_url: env.MERCADOPAGO_WEBHOOK_URL,
-        statement_descriptor: "MAYUSTUDIO",
-        binary_mode: true,
-        payer:
-          payload.payerEmail || payload.payerFirstName || payload.payerLastName
-            ? {
-                email: payload.payerEmail,
-                name: payload.payerFirstName,
-                surname: payload.payerLastName,
-              }
-            : undefined,
+        notification_url: `${env.NEXT_PUBLIC_APP_URL}/api/webhooks/mercadopago`,
         items: [
           {
             id: reservation.id,
-            category_id: "services",
-            description: "Reserva de sesión fotográfica infantil",
-            title: payload.title,
+            title,
             quantity: 1,
-            unit_price: effectiveAmount,
-            currency_id: effectiveCurrency,
+            unit_price: amount,
+            currency_id: "UYU",
           },
         ],
-        payment_methods: {
-          excluded_payment_methods: [],
-          excluded_payment_types: [],
-        },
         back_urls: {
           success: `${env.NEXT_PUBLIC_APP_URL}/pago/success`,
           pending: `${env.NEXT_PUBLIC_APP_URL}/pago/pending`,
@@ -96,40 +46,26 @@ export async function POST(request: Request) {
       },
     });
 
-    const payment = await prisma.payment.create({
+    // 3. Guardar payment pendiente
+    await prisma.payment.create({
       data: {
         reservationId: reservation.id,
         externalReference: reservation.externalReference,
-        providerPreferenceId: response.id,
-        amount: effectiveAmount,
-        status: PaymentStatus.pending,
-        rawLatestPayload: JSON.parse(
-          JSON.stringify(response),
-        ) as Prisma.InputJsonValue,
+        providerPreferenceId: preference.id,
+        amount,
+        status: "pending",
       },
     });
 
+    // 4. Devolver URLs de checkout
     return NextResponse.json({
-      reservationId: reservation.id,
-      paymentId: payment.id,
-      amount: effectiveAmount,
-      currency: effectiveCurrency,
-      preferenceId: response.id,
-      checkoutUrl: response.init_point,
-      checkoutSandboxUrl: response.sandbox_init_point,
+      init_point: preference.init_point,
+      sandbox_init_point: preference.sandbox_init_point,
     });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Payload inválido", details: error.issues },
-        { status: 400 },
-      );
-    }
-
+    console.error("Error creando preference:", error);
     return NextResponse.json(
-      {
-        error: "No se pudo crear la preferencia de pago",
-      },
+      { error: "No se pudo crear la preferencia" },
       { status: 500 },
     );
   }

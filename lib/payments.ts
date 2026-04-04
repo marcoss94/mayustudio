@@ -1,45 +1,25 @@
 import { PaymentStatus, ReservationStatus } from "@prisma/client";
 
-export function mapMercadoPagoStatus(status?: string | null): PaymentStatus {
-  switch (status) {
-    case "approved":
-      return PaymentStatus.approved;
-    case "authorized":
-      return PaymentStatus.authorized;
-    case "in_process":
-      return PaymentStatus.in_process;
-    case "rejected":
-      return PaymentStatus.rejected;
-    case "cancelled":
-      return PaymentStatus.cancelled;
-    case "refunded":
-      return PaymentStatus.refunded;
-    case "charged_back":
-      return PaymentStatus.chargeback;
-    case "pending":
-      return PaymentStatus.pending;
-    default:
-      return PaymentStatus.unknown;
-  }
+const MP_STATUS_MAP: Record<string, PaymentStatus> = {
+  approved: "approved",
+  authorized: "authorized",
+  in_process: "in_process",
+  pending: "pending",
+  rejected: "rejected",
+  cancelled: "cancelled",
+  refunded: "refunded",
+  charged_back: "chargeback",
+};
+
+export function mapMpStatus(mpStatus?: string | null): PaymentStatus {
+  return MP_STATUS_MAP[mpStatus ?? ""] ?? "unknown";
 }
 
-export function mapReservationStatusFromPayment(
-  paymentStatus: PaymentStatus,
+export function reservationStatusFromPayment(
+  ps: PaymentStatus,
 ): ReservationStatus {
-  switch (paymentStatus) {
-    case PaymentStatus.approved:
-    case PaymentStatus.authorized:
-      return ReservationStatus.confirmed;
-    case PaymentStatus.pending:
-    case PaymentStatus.in_process:
-      return ReservationStatus.payment_processing;
-    case PaymentStatus.rejected:
-    case PaymentStatus.cancelled:
-      return ReservationStatus.pending_payment;
-    case PaymentStatus.refunded:
-    case PaymentStatus.chargeback:
-      return ReservationStatus.cancelled;
-    default:
-      return ReservationStatus.pending_payment;
-  }
+  if (ps === "approved" || ps === "authorized") return "confirmed";
+  if (ps === "pending" || ps === "in_process") return "payment_processing";
+  if (ps === "refunded" || ps === "chargeback") return "cancelled";
+  return "pending_payment";
 }
