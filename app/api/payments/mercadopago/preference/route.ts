@@ -3,9 +3,27 @@ import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { mpPreference } from "@/lib/mercadopago";
 import { prisma } from "@/lib/prisma";
+import {
+  applyRateLimit,
+  buildRateLimitHeaders,
+  getClientIp,
+} from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const limit = applyRateLimit({
+      key: `preference:${clientIp}`,
+      config: { windowMs: 60_000, max: 10 },
+    });
+
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: "Demasiadas solicitudes. Intentá nuevamente en unos segundos." },
+        { status: 429, headers: buildRateLimitHeaders(limit) },
+      );
+    }
+
     const body = (await request.json()) as {
       title?: string;
       amount?: number;
@@ -61,7 +79,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       init_point: preference.init_point,
       sandbox_init_point: preference.sandbox_init_point,
-    });
+    }, { headers: buildRateLimitHeaders(limit) });
   } catch (error) {
     console.error("Error creando preference:", error);
     return NextResponse.json(

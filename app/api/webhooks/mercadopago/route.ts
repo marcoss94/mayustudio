@@ -6,6 +6,11 @@ import { env } from "@/lib/env";
 import { mpPayment } from "@/lib/mercadopago";
 import { mapMpStatus, reservationStatusFromPayment } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
+import {
+  applyRateLimit,
+  buildRateLimitHeaders,
+  getClientIp,
+} from "@/lib/rate-limit";
 
 /**
  * Valida firma x-signature de Mercado Pago.
@@ -65,6 +70,19 @@ function validateSignature(options: {
  */
 export async function POST(request: Request) {
   try {
+    const webhookIp = getClientIp(request);
+    const limit = applyRateLimit({
+      key: `webhook:${webhookIp}`,
+      config: { windowMs: 60_000, max: 120 },
+    });
+
+    if (!limit.allowed) {
+      return new Response(null, {
+        status: 429,
+        headers: buildRateLimitHeaders(limit),
+      });
+    }
+
     const url = new URL(request.url);
     const type = url.searchParams.get("type") ?? url.searchParams.get("topic");
     const dataId = url.searchParams.get("data.id");
@@ -149,7 +167,10 @@ export async function POST(request: Request) {
       }
     }
 
-    return new Response(null, { status: 204 });
+    return new Response(null, {
+      status: 204,
+      headers: buildRateLimitHeaders(limit),
+    });
   } catch (error) {
     console.error("[webhook] Error procesando:", error);
     return new Response(null, { status: 200 });
