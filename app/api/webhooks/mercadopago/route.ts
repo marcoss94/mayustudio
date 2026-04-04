@@ -38,6 +38,7 @@ function validateSignature(options: {
 
   // 2. Armar manifest con template oficial de MP
   const manifest = `id:${options.dataId};request-id:${options.xRequestId};ts:${ts};`;
+  console.log("[webhook-debug] manifest:", manifest);
 
   // 3. Calcular HMAC SHA256
   const expected = crypto
@@ -86,7 +87,12 @@ export async function POST(request: Request) {
       });
 
       if (!isValid) {
-        console.warn("[webhook] Firma inválida");
+        console.warn("[webhook] Firma inválida", {
+          dataId,
+          xRequestId,
+          xSignature: xSignature.substring(0, 40) + "...",
+          queryParams: url.search,
+        });
         return new Response(null, { status: 401 });
       }
 
