@@ -1,0 +1,297 @@
+@import 'tailwindcss';
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MayuStudio — Design System "The Timeless Curator"
+   Tailwind v4 CSS-first: todos los tokens viven aquí, sin tailwind.config.ts
+───────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* ─── Colors: Primary (Warm Brown) ─────────────────────────────────────── */
+  --color-primary: #735640;
+  --color-primary-container: #8e6e57;
+  --color-primary-light: #a68b76;
+  --color-on-primary: #ffffff;
+
+  /* ─── Colors: Secondary (Terra Cotta) ──────────────────────────────────── */
+  --color-secondary: #8c4f13;
+  --color-secondary-container: #fdac69;
+  --color-secondary-light: #b3722e;
+  --color-on-secondary: #ffffff;
+
+  /* ─── Colors: Tertiary (Sage Green) ────────────────────────────────────── */
+  --color-tertiary: #456431;
+  --color-tertiary-container: #5d7d47;
+  --color-tertiary-light: #7a9e64;
+  --color-on-tertiary: #ffffff;
+
+  /* ─── Colors: Surface (Warm Cream) ─────────────────────────────────────── */
+  --color-surface: #fcfaed;
+  --color-surface-dim: #f5f0dc;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f6f4e7;
+  --color-surface-container: #f0eee1;
+  --color-surface-container-high: #eae9dc;
+  --color-surface-container-highest: #e5e3d6;
+
+  /* ─── Colors: On-Surface ────────────────────────────────────────────────── */
+  --color-background: #fcfaed;
+  --color-on-background: #1b1c14;
+  --color-on-surface: #1b1c14;
+  --color-on-surface-variant: #4f453e;
+
+  /* ─── Colors: Inverse ───────────────────────────────────────────────────── */
+  --color-inverse-surface: #303128;
+  --color-inverse-on-surface: #f3f1e4;
+  --color-inverse-primary: #e6bfa4;
+
+  /* ─── Colors: Outline ───────────────────────────────────────────────────── */
+  --color-outline: #81756d;
+  --color-outline-variant: #d3c4ba;
+
+  /* ─── Colors: Semantic ──────────────────────────────────────────────────── */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-success: #456431;
+  --color-warning: #8c4f13;
+
+  /* ─── Colors: Glass ─────────────────────────────────────────────────────── */
+  --color-glass: rgba(252, 250, 237, 0.8);
+  --color-glass-dark: rgba(115, 86, 64, 0.1);
+  --color-glass-border: rgba(211, 196, 186, 0.2);
+
+  /* ─── Typography: Font Families ─────────────────────────────────────────── */
+  --font-serif: var(--font-noto-serif), 'Georgia', 'Times New Roman', serif;
+  --font-sans: var(--font-inter), 'system-ui', '-apple-system', sans-serif;
+
+  /* ─── Typography: Font Sizes ────────────────────────────────────────────── */
+  --text-display-lg: 3.5rem;
+  --text-display-md: 2.5rem;
+  --text-display-sm: 2rem;
+  --text-headline-lg: 1.75rem;
+  --text-headline-md: 1.5rem;
+  --text-headline-sm: 1.25rem;
+  --text-label-lg: 0.875rem;
+  --text-label-md: 0.75rem;
+  --text-label-sm: 0.625rem;
+
+  /* ─── Spacing: Custom Scale ─────────────────────────────────────────────── */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-88: 22rem;
+  --spacing-128: 32rem;
+
+  /* ─── Border Radius ─────────────────────────────────────────────────────── */
+  --radius-card: 1.5rem;
+  --radius-button: 0.75rem;
+  --radius-input: 0.5rem;
+  --radius-chip: 0.375rem;
+  --radius-full: 9999px;
+
+  /* ─── Shadows: Tonal (ultra-diffused, warm-tinted) ──────────────────────── */
+  --shadow-tonal-xs: 0 1px 2px rgba(63, 43, 34, 0.03);
+  --shadow-tonal-sm: 0 1px 3px rgba(63, 43, 34, 0.04);
+  --shadow-tonal-md: 0 4px 12px rgba(63, 43, 34, 0.06);
+  --shadow-tonal-lg: 0 8px 30px rgba(63, 43, 34, 0.08);
+  --shadow-tonal-xl: 0 20px 40px rgba(63, 43, 34, 0.06);
+  --shadow-glass: 0 8px 32px rgba(63, 43, 34, 0.06);
+  --shadow-glass-hover: 0 12px 40px rgba(63, 43, 34, 0.1);
+
+  /* ─── Animations ────────────────────────────────────────────────────────── */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-scale-in: scale-in 0.2s ease-out;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Base Layer — Global element defaults
+───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface text-on-surface font-sans antialiased;
+    min-height: 100dvh;
+    line-height: 1.6;
+  }
+
+  /* Headings use Noto Serif — the editorial voice of MayuStudio */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-serif;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h5,
+  h6 {
+    @apply font-sans font-semibold;
+    line-height: 1.3;
+  }
+
+  /* Focus visible — accesibilidad sin sacrificar estética */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-input);
+  }
+
+  /* Selection colors */
+  ::selection {
+    background-color: var(--color-secondary-container);
+    color: var(--color-on-surface);
+  }
+
+  /* ─── Glassmorphism primitive ─────────────────────────────────────────── */
+  .glass {
+    background: var(--color-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* ─── Gradient CTA ────────────────────────────────────────────────────── */
+  .gradient-cta {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-primary-container) 100%
+    );
+  }
+
+  /* ─── Ghost border (outline-variant at 15%) ───────────────────────────── */
+  .border-ghost {
+    border: 1px solid rgba(211, 196, 186, 0.15);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Utilities Layer — Compound design-system classes
+───────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Card de contenido — superficie elevada con glassmorphism */
+  .glass-card {
+    background: var(--color-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-glass);
+    border: 1px solid var(--color-glass-border);
+  }
+
+  /* Navbar flotante — sticky con blur */
+  .glass-nav {
+    background: var(--color-glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: var(--shadow-tonal-sm);
+    border-bottom: 1px solid var(--color-glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  /* Surface container — card sin blur */
+  .surface-card {
+    background-color: var(--color-surface-container-low);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-tonal-md);
+  }
+
+  /* Botón primario con gradiente */
+  .btn-primary {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-primary-container) 100%
+    );
+    color: var(--color-on-primary);
+    border-radius: var(--radius-full);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition:
+      box-shadow 0.2s ease,
+      transform 0.1s ease;
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--shadow-tonal-lg);
+    transform: translateY(-1px);
+  }
+
+  /* Label uppercase — etiquetas de categoría / badge */
+  .label-caps {
+    font-family: var(--font-sans);
+    font-size: var(--text-label-lg);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Display serif — titulares grandes */
+  .display-lg {
+    font-family: var(--font-serif);
+    font-size: var(--text-display-lg);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .display-md {
+    font-family: var(--font-serif);
+    font-size: var(--text-display-md);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .display-sm {
+    font-family: var(--font-serif);
+    font-size: var(--text-display-sm);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+}
