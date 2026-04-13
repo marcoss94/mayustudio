@@ -8,12 +8,21 @@
 import { cache } from 'react';
 import { prisma } from '@/lib/db/client';
 
+export interface GalleryImageSummary {
+  id: string;
+  url: string;
+  alt: string;
+  caption: string | null;
+  styleSlug: string | null;
+  order: number;
+}
+
 /**
  * Imágenes de galería visibles.
  * Si se pasa styleSlug, filtra por ese servicio.
  * Ordenadas por el campo `order` ascendente.
  */
-export const getGalleryImages = cache(async (styleSlug?: string) => {
+export const getGalleryImages = cache(async (styleSlug?: string): Promise<GalleryImageSummary[]> => {
   try {
     return await prisma.galleryImage.findMany({
       where: {
@@ -40,7 +49,7 @@ export const getGalleryImages = cache(async (styleSlug?: string) => {
  * Slugs únicos de servicios que tienen al menos una imagen visible.
  * Usado para los filtros de la galería.
  */
-export const getGalleryCategories = cache(async () => {
+export const getGalleryCategories = cache(async (): Promise<string[]> => {
   try {
     const images = await prisma.galleryImage.findMany({
       where: {

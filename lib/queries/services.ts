@@ -7,12 +7,32 @@
 
 import { cache } from 'react';
 import { prisma } from '@/lib/db/client';
+import type { StyleType } from '@prisma/client';
+
+// ─── Tipos de retorno ────────────────────────────────────────────────────────
+
+export interface StyleSummary {
+  id: string;
+  name: string;
+  slug: string;
+  type: StyleType;
+  shortDescription: string | null;
+  price: number | null;
+  duration: number | null;
+  coverImage: string | null;
+  badge: string | null;
+  highlights: string[];
+  label: string | null;
+  accentColor: string | null;
+  minChildAge: number | null;
+  maxChildAge: number | null;
+}
 
 /**
  * Estilos activos y visibles (Cake Smash, Fine Art, Minimalista).
  * Excluye SEASONAL por defecto.
  */
-export const getActiveStyles = cache(async (includeSeasonal = false) => {
+export const getActiveStyles = cache(async (includeSeasonal = false): Promise<StyleSummary[]> => {
   try {
     const styles = await prisma.style.findMany({
       where: {
@@ -39,10 +59,11 @@ export const getActiveStyles = cache(async (includeSeasonal = false) => {
       orderBy: { displayOrder: 'asc' },
     });
 
-    return styles.map((s) => ({
+    const mapped = styles.map((s) => ({
       ...s,
       price: s.price?.toNumber() ?? null,
     }));
+    return mapped;
   } catch {
     console.warn('[getActiveStyles] DB not available, returning empty');
     return [];
@@ -130,7 +151,7 @@ export const getStyleBySlug = cache(async (slug: string) => {
 /**
  * Slugs de todos los estilos activos — para generateStaticParams.
  */
-export const getStyleSlugs = cache(async () => {
+export const getStyleSlugs = cache(async (): Promise<{ slug: string; name: string }[]> => {
   try {
     return await prisma.style.findMany({
       where: { isActive: true, isVisible: true },
