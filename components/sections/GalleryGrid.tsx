@@ -23,7 +23,7 @@ export interface GalleryImage {
   url: string;
   alt: string;
   caption: string | null;
-  serviceSlug: string | null;
+  styleSlug: string | null;
 }
 
 export interface GalleryService {
@@ -48,7 +48,7 @@ export function GalleryGrid({ images, services }: GalleryGridProps) {
   const filteredImages =
     activeFilter === ALL_FILTER
       ? images
-      : images.filter((img) => img.serviceSlug === activeFilter);
+      : images.filter((img) => img.styleSlug === activeFilter);
 
   function handleFilterChange(slug: string) {
     startTransition(() => {

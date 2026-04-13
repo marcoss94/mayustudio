@@ -1,203 +1,164 @@
-/**
- * /servicios — Listado de todos los servicios activos, agrupados por categoría.
- *
- * Server Component. Data fetching directo via query helper.
- * Layout asimétrico: mobile 1 col, tablet 2 col, desktop grid con variación.
- */
-
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { getActiveServices } from '@/lib/queries/services';
-import { itemListJsonLd } from '@/lib/seo/json-ld';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { ServiceCard } from '@/components/ui/ServiceCard';
-
-// ── Metadata ─────────────────────────────────────────────────────────────────
+import { getActiveStyles } from '@/lib/queries/services';
 
 export const metadata: Metadata = {
-  title: 'Servicios',
+  title: 'Estilos',
   description:
-    'Descubrí todas las sesiones de fotografía infantil de MayuStudio: Cake Smash, Fine Art, Minimalista, Especiales estacionales y la Experiencia Completa. Momentos únicos capturados con arte.',
-  openGraph: {
-    title: 'Servicios — MayuStudio',
-    description:
-      'Sesiones de fotografía infantil boutique: Cake Smash, Fine Art, Minimalista, Especiales y Experiencia Completa.',
-    type: 'website',
-  },
+    'Descubrí todos los estilos de fotografía infantil de MayuStudio: Cake Smash, Fine Art y Minimalista. Momentos únicos capturados con arte.',
 };
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+export default async function EstilosPage() {
+  const styles = await getActiveStyles();
 
-export default async function ServiciosPage() {
-  const services = await getActiveServices();
-
-  // Agrupar por categoría manteniendo el orden del servidor
-  const grouped = services.reduce<
-    Record<string, { categoryName: string; categoryOrder: number; items: typeof services }>
-  >((acc, service) => {
-    const { id: categoryId, name: categoryName, order: categoryOrder } = service.category;
-    if (!acc[categoryId]) {
-      acc[categoryId] = { categoryName, categoryOrder, items: [] };
-    }
-    acc[categoryId].items.push(service);
-    return acc;
-  }, {});
-
-  const sortedGroups = Object.values(grouped).sort(
-    (a, b) => a.categoryOrder - b.categoryOrder,
-  );
-
-  // JSON-LD ItemList
-  const jsonLd = itemListJsonLd(
-    services.map((s) => ({ name: s.name, slug: s.slug })),
-  );
 
   return (
-    <>
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <main className="min-h-[100dvh]">
-        {/* ── Hero / Header ── */}
-        <section className="bg-[var(--color-surface-container-low)] pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <SectionHeader
-              title="Nuestras Sesiones"
-              subtitle="Cada servicio está diseñado para capturar la esencia única de tu pequeño. Explorá las opciones y encontrá la experiencia que mejor conecta con tu familia."
-              align="center"
-            />
+    <main className="pt-24">
+      {/* ─── Hero ──────────────────────────────────────────────────────── */}
+      <section className="bg-surface-container-low relative flex min-h-[500px] items-center md:min-h-[600px]">
+        {/* Japandi dot pattern */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: 'radial-gradient(#d3c4ba 0.5px, transparent 0.5px)',
+            backgroundSize: '24px 24px',
+          }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 text-center md:px-8 md:py-20">
+          <div className="mx-auto max-w-3xl">
+            <span className="border-outline-variant/60 text-primary mb-6 inline-block rounded-full border px-4 py-1 font-sans text-xs tracking-[0.2em] uppercase md:mb-8">
+              Nuestra Curaduría
+            </span>
+            <h1 className="text-on-background mb-6 font-serif text-4xl leading-tight tracking-tight md:mb-8 md:text-6xl lg:text-8xl">
+              Nuestros <span className="font-normal italic">Estilos</span> de Fotografía
+            </h1>
+            <p className="text-on-surface-variant mx-auto max-w-2xl text-base leading-relaxed md:text-xl">
+              Capturamos la pureza de los primeros años a través de tres lenguajes visuales
+              distintos, diseñados para trascender el tiempo y reflejar la esencia de su hogar.
+            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Categorías con servicios ── */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
-          {sortedGroups.length === 0 && (
-            <div className="text-center py-24">
-              <p className="font-sans text-[var(--color-on-surface-variant)] text-lg">
-                Próximamente nuevas sesiones disponibles.
-              </p>
-              <Link
-                href="/contacto"
-                className="mt-6 inline-block label-caps text-primary underline underline-offset-4"
-              >
-                Consultanos directamente
-              </Link>
-            </div>
-          )}
+      {/* ─── Intro ─────────────────────────────────────────────────────── */}
+      <section className="bg-surface py-16 md:py-24">
+        <div className="mx-auto max-w-4xl px-4 text-center md:px-8">
+          <h2 className="mb-8 font-serif text-2xl leading-snug md:text-4xl">
+            Cada familia imagina sus momentos de forma única.
+          </h2>
+          <div className="bg-outline-variant mx-auto mb-8 h-[1px] w-16 opacity-40" />
+          <p className="text-on-surface-variant text-base leading-relaxed md:text-lg">
+            Entendemos que la fotografía es una extensión de la identidad de su hogar. Por eso,
+            hemos curado tres enfoques estéticos que permiten que cada sesión sea un reflejo
+            auténtico de su visión, desde la explosión de alegría de un cumpleaños hasta la
+            serenidad atemporal de un retrato artístico.
+          </p>
+        </div>
+      </section>
 
-          {sortedGroups.map(({ categoryName, items }) => (
-            <section key={categoryName} aria-labelledby={`cat-${categoryName}`}>
-              {/* Heading de categoría */}
-              <div className="mb-10 flex items-end gap-4">
-                <h2
-                  id={`cat-${categoryName}`}
-                  className="font-serif text-2xl sm:text-3xl text-on-surface"
+      {/* ─── Estilos ───────────────────────────────────────────────────── */}
+      {styles.map((style, index) => {
+        const isReversed = index % 2 !== 0;
+        const bgClass = index % 2 === 0 ? 'bg-surface-container-low' : 'bg-surface';
+
+        return (
+          <section key={style.slug} className={`py-20 md:py-32 ${bgClass}`}>
+            <div
+              className={`mx-auto flex max-w-7xl flex-col px-4 md:px-8 ${
+                isReversed ? 'md:flex-row-reverse' : 'md:flex-row'
+              } items-center gap-12 md:gap-24`}
+            >
+              {/* Imagen */}
+              <div className="w-full md:w-1/2">
+                <div
+                  className={`${style.type === 'SETS_AND_TIERS' ? 'aspect-[5/4]' : 'aspect-[4/5]'} relative overflow-hidden rounded-2xl shadow-lg`}
                 >
-                  {categoryName}
-                </h2>
-                <span
-                  aria-hidden="true"
-                  className="flex-1 h-px bg-[var(--color-outline-variant)] opacity-40 mb-1.5"
-                />
+                  <Image
+                    src={
+                      style.coverImage ||
+                      `https://picsum.photos/seed/${style.slug}-style/${style.type === 'SETS_AND_TIERS' ? '1000/800' : '640/800'}`
+                    }
+                    alt={style.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </div>
 
-              {/*
-               * Grid asimétrico por diseño:
-               * - Mobile: 1 columna
-               * - Tablet (sm): 2 columnas
-               * - Desktop (lg): depende de cantidad de items
-               *   - 1 item  → centrado, max-w-sm
-               *   - 2 items → 2 columnas con cards anchos
-               *   - 3+ items → primero grande (col-span-2) + resto normales, o 3 col estándar
-               *
-               * Para no tener 3 iguales en fila: el primer item de cada grupo recibe
-               * énfasis visual diferente cuando hay múltiples items (featured).
-               */}
-              <ServiceGrid items={items} />
-            </section>
-          ))}
-        </div>
+              {/* Texto */}
+              <div className="w-full md:w-1/2">
+                <span
+                  className="font-sans text-xs tracking-[0.3em] uppercase mb-4 block font-semibold text-primary"
+                >
+                  {style.label || style.name}
+                </span>
+                <h3 className="mb-6 font-serif text-3xl md:text-5xl">{style.name}</h3>
+                <p className="text-on-surface-variant mb-8 text-base leading-relaxed md:text-lg">
+                  {style.shortDescription || style.name}
+                </p>
+                {style.highlights.length > 0 && (
+                  <ul className="text-on-surface mb-10 space-y-4">
+                    {style.highlights.map((h: string) => (
+                      <li key={h} className="flex items-center gap-3">
+                        <span
+                          className="h-5 w-5 shrink-0 rounded-full bg-primary flex items-center justify-center"
+                          aria-hidden="true"
+                        >
+                          <svg
+                            className="h-3 w-3 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={3}
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </span>
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <Link
+                  href={`/servicios/${style.slug}`}
+                  className="bg-primary text-on-primary inline-flex min-h-[48px] items-center rounded-full px-8 py-3.5 font-sans text-sm font-semibold tracking-widest uppercase shadow-[0_20px_40px_rgba(63,43,34,0.06)] transition-all hover:opacity-90 active:scale-[0.98] md:px-10 md:py-4"
+                >
+                  Ver detalles de {style.name}
+                </Link>
+              </div>
+            </div>
+          </section>
+        );
+      })}
 
-        {/* ── CTA final ── */}
-        <section className="gradient-cta py-20 px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-2xl mx-auto space-y-6">
-            <h2 className="font-serif text-2xl sm:text-3xl text-[var(--color-on-primary)] leading-tight">
-              ¿No encontrás lo que buscás?
-            </h2>
-            <p className="font-sans text-[var(--color-on-primary)] opacity-90 text-lg leading-relaxed">
-              Creamos experiencias a medida. Contanos tu idea y la hacemos realidad.
-            </p>
+      {/* ─── CTA final ─────────────────────────────────────────────────── */}
+      <section className="bg-primary text-on-primary px-4 py-24 text-center md:px-8 md:py-32">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="mb-8 font-serif text-3xl leading-tight md:text-6xl">
+            Crea un <span className="font-normal italic">legado</span> eterno
+          </h2>
+          <p className="mx-auto mb-12 max-w-xl text-lg font-light opacity-90 md:text-xl">
+            No permitas que estos días pasen desapercibidos. Elige el estilo que mejor resuene con
+            tu familia y comencemos a planificar tu sesión.
+          </p>
+          <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
+            <Link
+              href="/reservar"
+              className="bg-on-primary text-primary flex min-h-[48px] items-center rounded-full px-10 py-4 text-lg font-bold shadow-[0_20px_40px_rgba(63,43,34,0.12)] transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-12 md:py-5"
+            >
+              Reservar sesión ahora
+            </Link>
             <Link
               href="/contacto"
-              className="inline-flex items-center justify-center min-h-[44px] px-8 py-3 rounded-full bg-[var(--color-surface)] text-primary font-semibold text-sm tracking-wide transition-all duration-200 hover:bg-[var(--color-surface-container-low)] active:scale-[0.98]"
+              className="border-on-primary flex min-h-[48px] items-center rounded-full border-2 bg-transparent px-10 py-4 text-lg font-bold transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-12 md:py-5"
             >
-              Consultanos
+              Enviar consulta directa
             </Link>
           </div>
-        </section>
-      </main>
-    </>
-  );
-}
-
-// ── ServiceGrid — layout asimétrico por cantidad ──────────────────────────────
-
-type ServiceItem = Awaited<ReturnType<typeof getActiveServices>>[number];
-
-function ServiceGrid({ items }: { items: ServiceItem[] }) {
-  const count = items.length;
-
-  // 1 item — centrado, card ancho
-  if (count === 1) {
-    return (
-      <div className="flex justify-center">
-        <div className="w-full sm:max-w-sm lg:max-w-md">
-          <ServiceCard service={items[0]} priority />
         </div>
-      </div>
-    );
-  }
-
-  // 2 items — 2 columnas iguales, cards prominentes
-  if (count === 2) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-10">
-        {items.map((item, i) => (
-          <ServiceCard key={item.id} service={item} priority={i === 0} />
-        ))}
-      </div>
-    );
-  }
-
-  // 3+ items — layout 2+1: primer item featured (más grande), resto en subgrid
-  // Desktop: featured a la izquierda (60%), stack de 2 a la derecha (40%)
-  // Tablet/Mobile: single column
-  return (
-    <div className="space-y-6">
-      {/* Primera fila: featured grande + stack de hasta 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 lg:gap-8 items-start">
-        {/* Featured — primer item */}
-        <ServiceCard service={items[0]} priority />
-
-        {/* Stack de los siguientes 1-2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
-          {items.slice(1, 3).map((item) => (
-            <ServiceCard key={item.id} service={item} />
-          ))}
-        </div>
-      </div>
-
-      {/* Fila adicional para el resto (4+) — grid uniforme */}
-      {items.length > 3 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {items.slice(3).map((item) => (
-            <ServiceCard key={item.id} service={item} />
-          ))}
-        </div>
-      )}
-    </div>
+      </section>
+    </main>
   );
 }

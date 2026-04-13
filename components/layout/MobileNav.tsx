@@ -11,10 +11,10 @@ interface MobileNavProps {
 
 const navLinks = [
   { href: '/', label: 'Inicio' },
-  { href: '/servicios', label: 'Servicios' },
+  { href: '/servicios', label: 'Estilos' },
   { href: '/galeria', label: 'Galería' },
-  { href: '/sobre-mi', label: 'Sobre mí' },
   { href: '/contacto', label: 'Contacto' },
+  { href: '/login', label: 'Iniciar sesión' },
 ];
 
 export function MobileNav({ isOpen, onClose }: MobileNavProps) {

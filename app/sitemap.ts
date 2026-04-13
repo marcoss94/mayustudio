@@ -8,7 +8,7 @@
  */
 
 import type { MetadataRoute } from 'next';
-import { getServiceSlugs } from '@/lib/queries/services';
+import { getStyleSlugs } from '@/lib/queries/services';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let servicioRoutes: MetadataRoute.Sitemap = [];
 
   try {
-    const slugs = await getServiceSlugs();
+    const slugs = await getStyleSlugs();
     servicioRoutes = slugs.map(({ slug }) => ({
       url: `${baseUrl}/servicios/${slug}`,
       lastModified: now,

@@ -6,7 +6,7 @@
  */
 
 import type { Metadata } from 'next';
-import { getServiceSlugs } from '@/lib/queries/services';
+import { getStyleSlugs } from '@/lib/queries/services';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ContactForm } from '@/components/ui/ContactForm';
 
@@ -101,7 +101,7 @@ function InstagramIcon() {
 // ─── Página ───────────────────────────────────────────────────────────────────
 
 export default async function ContactoPage() {
-  const services = await getServiceSlugs();
+  const services = await getStyleSlugs();
 
   return (
     <main className="min-h-[100dvh]">

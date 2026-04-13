@@ -14,6 +14,12 @@ enum UserRole {
   SUPERADMIN
 }
 
+enum StyleType {
+  STANDARD       // Precio único (Fine Art, Minimalista)
+  SETS_AND_TIERS // Múltiples sets con Standard/Premium (Cake Smash)
+  SEASONAL       // Temporada limitada (Día de las Madres, Navidad)
+}
+
 enum ReservationStatus {
   DRAFT
   PENDING_PAYMENT
@@ -39,8 +45,6 @@ enum WebhookEventStatus {
 }
 
 // ─── Auth.js Required Models ─────────────────────────────────────────────────
-// Estos modelos son requeridos por @auth/prisma-adapter con JWT strategy.
-// El modelo Session NO se incluye porque usamos JWT (no database sessions).
 
 model Account {
   id                String  @id @default(cuid())
@@ -70,7 +74,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ─── Domain Models ───────────────────────────────────────────────────────────
+// ─── User ────────────────────────────────────────────────────────────────────
 
 model User {
   id            String    @id @default(cuid())
@@ -78,7 +82,7 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  password      String?   // null para OAuth users
+  password      String?
   phone         String?
   role          UserRole  @default(CLIENT)
 
@@ -92,89 +96,159 @@ model User {
   @@index([role])
 }
 
-model ServiceCategory {
-  id          String  @id @default(cuid())
-  name        String
-  slug        String  @unique
-  description String?
-  order       Int     @default(0)
+// ─── Estilos (la estética fotográfica) ───────────────────────────────────────
 
-  services Service[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([slug])
-}
-
-model Service {
-  id               String   @id @default(cuid())
+model Style {
+  id               String    @id @default(cuid())
   name             String
-  slug             String   @unique
-  description      String?  @db.Text
-  shortDescription String?  @db.VarChar(200) // Resumen para cards (Phase 1)
-  price            Decimal  @db.Decimal(10, 2)
-  duration         Int      // minutos
-  isActive         Boolean  @default(true)
-  isVisible        Boolean  @default(true)
-  images           String[] // URLs de S3
-  coverImage       String?             // URL imagen principal (Phase 1)
-  highlights       String[]            // Ej: ["Torta artesanal incluida", "20 fotos editadas"] (Phase 1)
-  badge            String?  @db.VarChar(30) // Ej: "Más popular", "Nuevo", "Estacional" (Phase 1)
-  minChildAge      Int?                // Edad mínima en meses; 0 = recién nacido (Phase 1)
-  maxChildAge      Int?                // Edad máxima en meses; null = sin límite (Phase 1)
+  slug             String    @unique
+  type             StyleType
+  description      String?   @db.Text
+  shortDescription String?   @db.VarChar(200)
+  coverImage       String?
+  images           String[]
+  highlights       String[]
+  badge            String?   @db.VarChar(30)
+  label            String?   @db.VarChar(50)  // ej: "Celebración Vibrante", "Legado Artístico"
+  accentColor      String?   @db.VarChar(7)   // hex ej: "#8c4f13" — para checks y labels
+  duration         Int?      // minutos (para estilos con duración fija)
+  price            Decimal?  @db.Decimal(10, 2) // solo para STANDARD y SEASONAL
+  minChildAge      Int?      // meses
+  maxChildAge      Int?      // meses
+  isActive         Boolean   @default(true)
+  isVisible        Boolean   @default(true)
+  displayOrder     Int       @default(0)
+  seasonStart      DateTime? // solo SEASONAL
+  seasonEnd        DateTime? // solo SEASONAL
 
-  categoryId String
-  category   ServiceCategory @relation(fields: [categoryId], references: [id])
-
+  sets         StyleSet[]
+  extras       StyleExtra[]
   reservations Reservation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([categoryId])
   @@index([slug])
-  @@index([isActive])
-  @@index([isVisible])
+  @@index([type])
+  @@index([isActive, isVisible])
+  @@index([displayOrder])
 }
 
-model Reservation {
-  id          String            @id @default(cuid())
-  userId      String
-  serviceId   String
-  status      ReservationStatus @default(DRAFT)
-  startsAt    DateTime
-  endsAt      DateTime
-  childName   String?
-  childAge    Int?
-  notes       String?           @db.Text
-  totalAmount Decimal           @db.Decimal(10, 2)
-  expiresAt   DateTime?         // now() + 10min para PENDING_PAYMENT
+// Sets temáticos (solo para estilos tipo SETS_AND_TIERS, ej: Cake Smash)
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  service Service @relation(fields: [serviceId], references: [id])
-  payment Payment?
+model StyleSet {
+  id            String  @id @default(cuid())
+  styleId       String
+  name          String
+  slug          String
+  description   String? @db.Text
+  coverImage    String?
+  images        String[]
+  standardPrice Decimal @db.Decimal(10, 2)
+  premiumPrice  Decimal @db.Decimal(10, 2)
+  isCustom      Boolean @default(false) // true = set personalizado (precio fijo, texto libre)
+  customPrice   Decimal? @db.Decimal(10, 2) // precio fijo del set personalizado (sin tiers)
+  isActive      Boolean @default(true)
+  displayOrder  Int     @default(0)
+
+  style        Style         @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([styleId, slug])
+  @@index([styleId, isActive])
+  @@index([displayOrder])
+}
+
+// Extras opcionales (ej: para Minimalista)
+
+model StyleExtra {
+  id       String  @id @default(cuid())
+  styleId  String
+  name     String
+  price    Decimal @db.Decimal(10, 2)
+  isActive Boolean @default(true)
+
+  style Style @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([styleId, isActive])
+}
+
+// ─── Experiencia Completa (config global) ────────────────────────────────────
+
+model ExperienciaCompletaConfig {
+  id            String  @id @default(cuid())
+  description   String? @db.Text
+  coverImage    String?
+  images        String[]
+  highlights    String[]
+  eventPrice3h  Decimal @db.Decimal(10, 2)
+  eventPrice4h  Decimal @db.Decimal(10, 2)
+  comboDiscount Decimal @db.Decimal(10, 2) // monto fijo de descuento
+  isActive      Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Reservas ────────────────────────────────────────────────────────────────
+
+model Reservation {
+  id                   String            @id @default(cuid())
+  userId               String
+  status               ReservationStatus @default(DRAFT)
+  startsAt             DateTime
+  endsAt               DateTime
+  childName            String?
+  childAge             Int?              // meses
+  notes                String?           @db.Text
+  totalAmount          Decimal           @db.Decimal(10, 2)
+  expiresAt            DateTime?         // now() + 10min para PENDING_PAYMENT
+
+  // Qué se reservó
+  styleId              String
+  styleSetId           String?           // null si el estilo no tiene sets
+  tier                 String?           // "standard" | "premium" | null (para custom/standard type)
+  customSetDescription String?  @db.Text // solo cuando styleSet.isCustom = true
+
+  // Experiencia completa (null si no aplica)
+  isExperienciaCompleta Boolean  @default(false)
+  eventDurationHours    Int?     // 3 o 4
+  eventPrice            Decimal? @db.Decimal(10, 2)
+  comboDiscount         Decimal? @db.Decimal(10, 2)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  style    Style     @relation(fields: [styleId], references: [id])
+  styleSet StyleSet? @relation(fields: [styleSetId], references: [id])
+  payment  Payment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
-  @@index([serviceId])
+  @@index([styleId])
   @@index([status])
   @@index([startsAt])
   @@index([expiresAt])
 }
 
+// ─── Pagos ───────────────────────────────────────────────────────────────────
+
 model Payment {
-  id             String        @id @default(cuid())
-  reservationId  String        @unique
-  externalId     String?       // Mercado Pago payment ID
-  provider       String        @default("mercadopago")
-  amount         Decimal       @db.Decimal(10, 2)
-  currency       String        @default("ARS")
-  status         PaymentStatus @default(PENDING)
-  paidAt         DateTime?
-  rawPayload     Json?         // Full MP webhook payload
+  id            String        @id @default(cuid())
+  reservationId String        @unique
+  externalId    String?
+  provider      String        @default("mercadopago")
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("ARS")
+  status        PaymentStatus @default(PENDING)
+  paidAt        DateTime?
+  rawPayload    Json?
 
   reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 
@@ -190,8 +264,8 @@ model Payment {
 
 model WebhookEvent {
   id          String             @id @default(cuid())
-  provider    String             // "mercadopago"
-  externalId  String?            // ID del evento en el proveedor
+  provider    String
+  externalId  String?
   eventType   String
   payload     Json
   status      WebhookEventStatus @default(RECEIVED)
@@ -207,19 +281,21 @@ model WebhookEvent {
   @@index([createdAt])
 }
 
+// ─── Galería ─────────────────────────────────────────────────────────────────
+
 model GalleryImage {
-  id          String  @id @default(cuid())
-  url         String
-  alt         String
-  caption     String?
-  order       Int     @default(0)
-  isVisible   Boolean @default(true)
-  serviceSlug String? @db.VarChar(100) // Soft ref para filtrar por servicio (Phase 1)
+  id        String  @id @default(cuid())
+  url       String
+  alt       String
+  caption   String?
+  order     Int     @default(0)
+  isVisible Boolean @default(true)
+  styleSlug String? @db.VarChar(100) // filtrar por estilo
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([isVisible, order])
-  @@index([serviceSlug])
-  @@index([isVisible, serviceSlug])
+  @@index([styleSlug])
+  @@index([isVisible, styleSlug])
 }

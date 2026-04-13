@@ -1,12 +1,13 @@
+import path from 'node:path';
+import dotenv from 'dotenv';
 import { defineConfig } from 'prisma/config';
 
-/**
- * prisma.config.ts — Prisma v7 configuration
- *
- * NOTA: En Prisma v7, el adapter de conexión (PrismaNeon) se configura
- * directamente en PrismaClient (lib/db/client.ts), no aquí.
- * prisma.config.ts es para opciones del CLI: schema path, migrations, etc.
- */
+dotenv.config({ path: path.join(__dirname, '.env.local') });
+dotenv.config({ path: path.join(__dirname, '.env') });
+
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: path.join(__dirname, 'prisma/schema.prisma'),
+  datasource: {
+    url: process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL ?? '',
+  },
 });

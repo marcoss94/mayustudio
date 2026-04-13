@@ -46,3 +46,9 @@ prisma/migrations/
 # local env files
 .env.local
 .env.*.local
+
+# AI tooling
+.agents/
+.claude/
+.stitch-ref/
+skills-lock.json

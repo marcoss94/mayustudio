@@ -1,5 +1,5 @@
 /**
- * lib/queries/services.ts — Query helpers para servicios
+ * lib/queries/services.ts — Query helpers para estilos y sets
  *
  * Server-only. NO importar en Client Components.
  * Usa React cache() para deduplicar queries dentro del mismo render tree.
@@ -9,134 +9,159 @@ import { cache } from 'react';
 import { prisma } from '@/lib/db/client';
 
 /**
- * Todos los servicios activos y visibles, ordenados por categoría + creación.
- * Incluye categoría completa para agrupar en la página de servicios.
- * El precio se convierte de Decimal a number aquí para evitar problemas de serialización.
+ * Estilos activos y visibles (Cake Smash, Fine Art, Minimalista).
+ * Excluye SEASONAL por defecto.
  */
-export const getActiveServices = cache(async () => {
+export const getActiveStyles = cache(async (includeSeasonal = false) => {
   try {
-    const services = await prisma.service.findMany({
-      where: { isActive: true, isVisible: true },
+    const styles = await prisma.style.findMany({
+      where: {
+        isActive: true,
+        isVisible: true,
+        ...(includeSeasonal ? {} : { type: { not: 'SEASONAL' } }),
+      },
       select: {
         id: true,
         name: true,
         slug: true,
+        type: true,
         shortDescription: true,
         price: true,
         duration: true,
         coverImage: true,
         badge: true,
         highlights: true,
+        label: true,
+        accentColor: true,
         minChildAge: true,
         maxChildAge: true,
-        category: {
-          select: { id: true, name: true, slug: true, order: true },
-        },
       },
-      orderBy: [{ category: { order: 'asc' } }, { createdAt: 'asc' }],
+      orderBy: { displayOrder: 'asc' },
     });
 
-    return services.map((s) => ({
+    return styles.map((s) => ({
       ...s,
-      price: s.price.toNumber(),
+      price: s.price?.toNumber() ?? null,
     }));
   } catch {
-    console.warn('[getActiveServices] DB not available, returning empty');
+    console.warn('[getActiveStyles] DB not available, returning empty');
     return [];
   }
 });
 
 /**
- * Servicios destacados para la home.
- * Prioriza servicios con badge; si hay menos de `limit`, completa con los primeros visibles.
+ * Estilos estacionales activos (dentro de su fecha).
  */
-export const getFeaturedServices = cache(async (limit = 3) => {
+export const getSeasonalStyles = cache(async () => {
   try {
-    const services = await prisma.service.findMany({
-      where: { isActive: true, isVisible: true },
+    const now = new Date();
+    const styles = await prisma.style.findMany({
+      where: {
+        isActive: true,
+        isVisible: true,
+        type: 'SEASONAL',
+        seasonStart: { lte: now },
+        seasonEnd: { gte: now },
+      },
       select: {
         id: true,
         name: true,
         slug: true,
         shortDescription: true,
         price: true,
-        duration: true,
         coverImage: true,
         badge: true,
-        category: {
-          select: { id: true, name: true, slug: true, order: true },
-        },
+        seasonStart: true,
+        seasonEnd: true,
       },
-      orderBy: [{ category: { order: 'asc' } }, { createdAt: 'asc' }],
+      orderBy: { displayOrder: 'asc' },
     });
 
-    const withBadge = services.filter((s) => s.badge);
-    const withoutBadge = services.filter((s) => !s.badge);
-    const ordered = [...withBadge, ...withoutBadge].slice(0, limit);
-
-    return ordered.map((s) => ({
+    return styles.map((s) => ({
       ...s,
-      price: s.price.toNumber(),
+      price: s.price?.toNumber() ?? null,
     }));
   } catch {
-    console.warn('[getFeaturedServices] DB not available, returning empty');
+    console.warn('[getSeasonalStyles] DB not available, returning empty');
     return [];
   }
 });
 
 /**
- * Servicio individual por slug.
- * Retorna null si no existe o no está activo/visible.
+ * Estilo individual por slug con sets y extras.
  */
-export const getServiceBySlug = cache(async (slug: string) => {
+export const getStyleBySlug = cache(async (slug: string) => {
   try {
-    const service = await prisma.service.findFirst({
+    const style = await prisma.style.findFirst({
       where: { slug, isActive: true, isVisible: true },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        shortDescription: true,
-        price: true,
-        duration: true,
-        coverImage: true,
-        images: true,
-        badge: true,
-        highlights: true,
-        minChildAge: true,
-        maxChildAge: true,
-        category: {
-          select: { id: true, name: true, slug: true },
+      include: {
+        sets: {
+          where: { isActive: true },
+          orderBy: { displayOrder: 'asc' },
+        },
+        extras: {
+          where: { isActive: true },
         },
       },
     });
 
-    if (!service) return null;
+    if (!style) return null;
 
     return {
-      ...service,
-      price: service.price.toNumber(),
+      ...style,
+      price: style.price?.toNumber() ?? null,
+      sets: style.sets.map((s) => ({
+        ...s,
+        standardPrice: s.standardPrice.toNumber(),
+        premiumPrice: s.premiumPrice.toNumber(),
+        customPrice: s.customPrice?.toNumber() ?? null,
+      })),
+      extras: style.extras.map((e) => ({
+        ...e,
+        price: e.price.toNumber(),
+      })),
     };
   } catch {
-    console.warn('[getServiceBySlug] DB not available');
+    console.warn('[getStyleBySlug] DB not available');
     return null;
   }
 });
 
 /**
- * Slugs y nombres de todos los servicios activos.
- * Usado en generateStaticParams y en selects de ContactForm.
+ * Slugs de todos los estilos activos — para generateStaticParams.
  */
-export const getServiceSlugs = cache(async () => {
+export const getStyleSlugs = cache(async () => {
   try {
-    return await prisma.service.findMany({
+    return await prisma.style.findMany({
       where: { isActive: true, isVisible: true },
       select: { slug: true, name: true },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { displayOrder: 'asc' },
     });
   } catch {
-    console.warn('[getServiceSlugs] DB not available, returning empty');
+    console.warn('[getStyleSlugs] DB not available, returning empty');
     return [];
+  }
+});
+
+/**
+ * Config de Experiencia Completa.
+ */
+export const getExperienciaCompletaConfig = cache(async () => {
+  try {
+    const config = await prisma.experienciaCompletaConfig.findFirst({
+      where: { isActive: true },
+    });
+
+    if (!config) return null;
+
+    return {
+      ...config,
+      eventPrice3h: config.eventPrice3h.toNumber(),
+      eventPrice4h: config.eventPrice4h.toNumber(),
+      comboDiscount: config.comboDiscount.toNumber(),
+    };
+  } catch {
+    console.warn('[getExperienciaCompletaConfig] DB not available');
+    return null;
   }
 });

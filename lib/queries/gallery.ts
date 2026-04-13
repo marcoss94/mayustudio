@@ -10,22 +10,22 @@ import { prisma } from '@/lib/db/client';
 
 /**
  * Imágenes de galería visibles.
- * Si se pasa serviceSlug, filtra por ese servicio.
+ * Si se pasa styleSlug, filtra por ese servicio.
  * Ordenadas por el campo `order` ascendente.
  */
-export const getGalleryImages = cache(async (serviceSlug?: string) => {
+export const getGalleryImages = cache(async (styleSlug?: string) => {
   try {
     return await prisma.galleryImage.findMany({
       where: {
         isVisible: true,
-        ...(serviceSlug ? { serviceSlug } : {}),
+        ...(styleSlug ? { styleSlug } : {}),
       },
       select: {
         id: true,
         url: true,
         alt: true,
         caption: true,
-        serviceSlug: true,
+        styleSlug: true,
         order: true,
       },
       orderBy: { order: 'asc' },
@@ -45,15 +45,15 @@ export const getGalleryCategories = cache(async () => {
     const images = await prisma.galleryImage.findMany({
       where: {
         isVisible: true,
-        serviceSlug: { not: null },
+        styleSlug: { not: null },
       },
-      select: { serviceSlug: true },
-      distinct: ['serviceSlug'],
-      orderBy: { serviceSlug: 'asc' },
+      select: { styleSlug: true },
+      distinct: ['styleSlug'],
+      orderBy: { styleSlug: 'asc' },
     });
 
     return images
-      .map((img) => img.serviceSlug)
+      .map((img) => img.styleSlug)
       .filter((slug): slug is string => slug !== null);
   } catch {
     console.warn('[getGalleryCategories] DB not available, returning empty');

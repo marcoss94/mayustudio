@@ -1,337 +1,251 @@
+import path from 'node:path';
+import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { PrismaNeon } from '@prisma/adapter-neon';
 
-const prisma = new PrismaClient();
+dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) throw new Error('DATABASE_URL not set');
+
+const adapter = new PrismaNeon({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Limpiar datos existentes en orden correcto (FK constraints)
+  // Limpiar en orden correcto (FK constraints)
   await prisma.galleryImage.deleteMany();
   await prisma.reservation.deleteMany();
-  await prisma.service.deleteMany();
-  await prisma.serviceCategory.deleteMany();
+  await prisma.styleExtra.deleteMany();
+  await prisma.styleSet.deleteMany();
+  await prisma.experienciaCompletaConfig.deleteMany();
+  await prisma.style.deleteMany();
 
-  // ─── Categorías ───────────────────────────────────────────────────────────────
+  // ─── Estilos base ───────────────────────────────────────────────────
 
-  const [clasicas, artisticas, experiencias] = await Promise.all([
-    prisma.serviceCategory.create({
-      data: {
-        name: 'Sesiones Clásicas',
-        slug: 'clasicas',
-        description: 'Las sesiones más pedidas del estudio',
-        order: 1,
-      },
-    }),
-    prisma.serviceCategory.create({
-      data: {
-        name: 'Sesiones Artísticas',
-        slug: 'artisticas',
-        description: 'Para quienes buscan algo único',
-        order: 2,
-      },
-    }),
-    prisma.serviceCategory.create({
-      data: {
-        name: 'Experiencias',
-        slug: 'experiencias',
-        description: 'La experiencia completa MayuStudio',
-        order: 3,
-      },
-    }),
-  ]);
+  const cakeSmash = await prisma.style.create({
+    data: {
+      name: 'Cake Smash',
+      slug: 'cake-smash',
+      type: 'SETS_AND_TIERS',
+      description:
+        'Celebramos el primer año con una sesión divertida, llena de texturas y mucha espontaneidad. Cada set está diseñado para crear un mundo mágico alrededor de tu bebé.',
+      shortDescription:
+        'Celebramos el primer año con sets temáticos únicos y mucha espontaneidad.',
+      label: 'Celebración Vibrante',
+      accentColor: '#8c4f13',
+      coverImage: 'https://picsum.photos/seed/cake-smash-cover/800/600',
+      images: [
+        'https://picsum.photos/seed/cs1/800/600',
+        'https://picsum.photos/seed/cs2/800/600',
+      ],
+      highlights: [
+        'Torta artesanal incluida',
+        'Decoración temática completa',
+        'Vestuario a elección',
+        '20+ fotos editadas (Standard) / 40+ (Premium)',
+      ],
+      badge: 'Más popular',
+      duration: 60,
+      minChildAge: 11,
+      maxChildAge: 13,
+      displayOrder: 1,
+    },
+  });
 
-  // ─── Servicios ────────────────────────────────────────────────────────────────
+  const fineArt = await prisma.style.create({
+    data: {
+      name: 'Fine Art',
+      slug: 'fine-art',
+      type: 'STANDARD',
+      description:
+        'Retratos de inspiración pictórica donde cada luz y sombra es cuidadosamente esculpida. Una experiencia artística que transforma momentos en obras de arte.',
+      shortDescription:
+        'Retratos de inspiración pictórica con luz y sombra esculpida.',
+      label: 'Legado Artístico',
+      accentColor: '#735640',
+      coverImage: 'https://picsum.photos/seed/fine-art-cover/800/600',
+      images: [
+        'https://picsum.photos/seed/fa1/800/600',
+        'https://picsum.photos/seed/fa2/800/600',
+      ],
+      highlights: [
+        'Dirección artística completa',
+        'Iluminación de estudio profesional',
+        'Edición fine art detallada',
+        '15 fotos editadas',
+      ],
+      duration: 45,
+      price: 55000,
+      displayOrder: 2,
+    },
+  });
 
-  await prisma.service.createMany({
+  const minimalista = await prisma.style.create({
+    data: {
+      name: 'Minimalista',
+      slug: 'minimalista',
+      type: 'STANDARD',
+      description:
+        'La belleza de lo simple. Fondos neutros que permiten que la personalidad sea la protagonista. Ideal para capturar la esencia pura de tu hijo.',
+      shortDescription:
+        'La belleza de lo simple. Fondos neutros, protagonismo total.',
+      label: 'Menos es Más',
+      accentColor: '#456431',
+      coverImage: 'https://picsum.photos/seed/minimalista-cover/800/600',
+      images: [
+        'https://picsum.photos/seed/min1/800/600',
+        'https://picsum.photos/seed/min2/800/600',
+      ],
+      highlights: [
+        'Fondo neutro profesional',
+        'Vestuario en tonos naturales',
+        'Edición limpia y elegante',
+        '12 fotos editadas',
+      ],
+      duration: 30,
+      price: 38000,
+      displayOrder: 3,
+    },
+  });
+
+  // ─── Sets de Cake Smash ─────────────────────────────────────────────
+
+  await prisma.styleSet.createMany({
     data: [
       {
-        name: 'Cake Smash',
-        slug: 'cake-smash',
-        description:
-          'La sesión más divertida para celebrar el primer añito de tu bebé. Incluye torta artesanal decorada, escenografía temática personalizada, y 20 fotos profesionalmente editadas. La sesión dura aproximadamente 60 minutos, con tiempo para que el bebé explore, juegue y disfrute de su torta. Ideal para capturar esas expresiones únicas e irrepetibles.',
-        shortDescription: 'Celebrá el primer añito con torta artesanal y escenografía temática',
-        price: 45000,
-        duration: 60,
-        coverImage: 'https://picsum.photos/seed/cakesmash-cover/800/600',
-        images: [
-          'https://picsum.photos/seed/cakesmash1/800/600',
-          'https://picsum.photos/seed/cakesmash2/800/600',
-          'https://picsum.photos/seed/cakesmash3/800/600',
-        ],
-        highlights: [
-          'Torta artesanal incluida',
-          '20 fotos editadas',
-          'Escenografía personalizada',
-          'Outfit para el bebé',
-        ],
-        badge: 'Más popular',
-        minChildAge: 11,
-        maxChildAge: 13,
-        categoryId: clasicas.id,
-        isActive: true,
-        isVisible: true,
+        styleId: cakeSmash.id,
+        name: 'Jungla',
+        slug: 'jungla',
+        description: 'Set tropical con plantas, animales y colores vibrantes.',
+        coverImage: 'https://picsum.photos/seed/set-jungla/800/600',
+        standardPrice: 40000,
+        premiumPrice: 55000,
+        displayOrder: 1,
       },
       {
-        name: 'Fine Art',
-        slug: 'fine-art',
-        description:
-          'Sesiones artísticas con iluminación de estudio profesional, fondos pintados a mano y una estética cuidada hasta el último detalle. Creamos retratos de autor que se convierten en obras de arte para tu hogar. Incluye 15 fotos con edición artística avanzada.',
-        shortDescription: 'Retratos de autor con fondos pintados a mano y edición artística',
-        price: 55000,
-        duration: 45,
-        coverImage: 'https://picsum.photos/seed/fineart-cover/800/600',
-        images: [
-          'https://picsum.photos/seed/fineart1/800/600',
-          'https://picsum.photos/seed/fineart2/800/600',
-        ],
-        highlights: [
-          'Fondos pintados a mano',
-          '15 fotos con edición artística',
-          'Iluminación profesional de estudio',
-          'Dirección artística personalizada',
-        ],
-        badge: null,
-        minChildAge: 0,
-        maxChildAge: null,
-        categoryId: artisticas.id,
-        isActive: true,
-        isVisible: true,
+        styleId: cakeSmash.id,
+        name: 'Princesa',
+        slug: 'princesa',
+        description: 'Set de fantasía con coronas, tules y tonos pastel.',
+        coverImage: 'https://picsum.photos/seed/set-princesa/800/600',
+        standardPrice: 42000,
+        premiumPrice: 58000,
+        displayOrder: 2,
       },
       {
-        name: 'Minimalista',
-        slug: 'minimalista',
-        description:
-          'Menos es más. Fondos neutros, luz natural y la belleza pura de tu bebé como protagonista. Sin distracciones, sin excesos — solo momentos genuinos capturados con sensibilidad. Incluye 12 fotos editadas con un estilo limpio y atemporal.',
-        shortDescription: 'Fondos neutros, luz natural y la belleza pura de tu bebé',
-        price: 38000,
-        duration: 40,
-        coverImage: 'https://picsum.photos/seed/minimal-cover/800/600',
-        images: [
-          'https://picsum.photos/seed/minimal1/800/600',
-          'https://picsum.photos/seed/minimal2/800/600',
-        ],
-        highlights: [
-          'Luz natural',
-          '12 fotos editadas',
-          'Estética atemporal',
-          'Fondos neutros premium',
-        ],
-        badge: null,
-        minChildAge: 0,
-        maxChildAge: null,
-        categoryId: artisticas.id,
-        isActive: true,
-        isVisible: true,
+        styleId: cakeSmash.id,
+        name: 'Aventurero',
+        slug: 'aventurero',
+        description: 'Set rústico con elementos de exploración y naturaleza.',
+        coverImage: 'https://picsum.photos/seed/set-aventurero/800/600',
+        standardPrice: 40000,
+        premiumPrice: 55000,
+        displayOrder: 3,
       },
       {
-        name: 'Especiales y Estacionales',
-        slug: 'especiales-estacionales',
+        styleId: cakeSmash.id,
+        name: 'Set Personalizado',
+        slug: 'personalizado',
         description:
-          'Sesiones temáticas que cambian con las estaciones y fechas especiales: Navidad, Pascua, Día de la Madre, Halloween, y más. Escenografías únicas diseñadas especialmente para cada temporada. Consultá la temática disponible del mes.',
-        shortDescription: 'Sesiones temáticas por temporada: Navidad, Pascua, Halloween y más',
-        price: 35000,
-        duration: 45,
-        coverImage: 'https://picsum.photos/seed/seasonal-cover/800/600',
-        images: ['https://picsum.photos/seed/seasonal1/800/600'],
-        highlights: [
-          'Escenografía temática exclusiva',
-          '15 fotos editadas',
-          'Props de temporada',
-          'Disponibilidad limitada',
-        ],
-        badge: 'Estacional',
-        minChildAge: 0,
-        maxChildAge: null,
-        categoryId: clasicas.id,
-        isActive: true,
-        isVisible: true,
-      },
-      {
-        name: 'Experiencia Completa',
-        slug: 'experiencia-completa',
-        description:
-          'La experiencia premium de MayuStudio. Combina lo mejor de todas nuestras sesiones en una jornada completa: cambios de escenografía, múltiples looks, y hasta 40 fotos editadas. Incluye sesión de Cake Smash + Fine Art + outfit personalizado. El recuerdo definitivo del primer año.',
-        shortDescription: 'Jornada completa premium: Cake Smash + Fine Art + 40 fotos editadas',
-        price: 85000,
-        duration: 120,
-        coverImage: 'https://picsum.photos/seed/complete-cover/800/600',
-        images: [
-          'https://picsum.photos/seed/complete1/800/600',
-          'https://picsum.photos/seed/complete2/800/600',
-          'https://picsum.photos/seed/complete3/800/600',
-        ],
-        highlights: [
-          'Cake Smash + Fine Art combinados',
-          '40 fotos editadas',
-          'Múltiples cambios de escenografía',
-          'Outfit personalizado incluido',
-          'Jornada completa de 2 horas',
-        ],
-        badge: 'Premium',
-        minChildAge: 11,
-        maxChildAge: 13,
-        categoryId: experiencias.id,
-        isActive: true,
-        isVisible: true,
+          'Diseñamos un set único según tu visión. Describí lo que imaginás y nosotros lo hacemos realidad.',
+        coverImage: 'https://picsum.photos/seed/set-custom/800/600',
+        standardPrice: 0, // no aplica
+        premiumPrice: 0, // no aplica
+        customPrice: 50000,
+        isCustom: true,
+        displayOrder: 99,
       },
     ],
   });
 
-  // ─── Galería ──────────────────────────────────────────────────────────────────
+  // ─── Extras de Minimalista ──────────────────────────────────────────
+
+  await prisma.styleExtra.createMany({
+    data: [
+      { styleId: minimalista.id, name: 'Foto impresa 20x30', price: 5000 },
+      { styleId: minimalista.id, name: 'Álbum digital premium', price: 8000 },
+      { styleId: minimalista.id, name: '5 fotos adicionales editadas', price: 6000 },
+    ],
+  });
+
+  // ─── Estilo estacional ──────────────────────────────────────────────
+
+  await prisma.style.create({
+    data: {
+      name: 'Día de las Madres',
+      slug: 'dia-de-las-madres',
+      type: 'SEASONAL',
+      description:
+        'Una sesión especial para celebrar el vínculo único entre mamá e hijo. Disponible solo en temporada.',
+      shortDescription: 'Celebrá el vínculo mamá e hijo con una sesión única.',
+      label: 'Temporada Especial',
+      accentColor: '#8c4f13',
+      coverImage: 'https://picsum.photos/seed/dia-madres/800/600',
+      highlights: [
+        'Sesión mamá + hijo/a',
+        'Set temático especial',
+        '15 fotos editadas',
+      ],
+      badge: 'Estacional',
+      duration: 40,
+      price: 35000,
+      seasonStart: new Date('2026-04-15'),
+      seasonEnd: new Date('2026-05-15'),
+      displayOrder: 10,
+    },
+  });
+
+  // ─── Experiencia Completa ───────────────────────────────────────────
+
+  await prisma.experienciaCompletaConfig.create({
+    data: {
+      description:
+        'Ofrecemos un servicio integral que combina la precisión artística de una sesión de estudio con la cobertura documental de tu evento. El resultado es un relato visual cohesivo, elegante y profundamente emotivo.',
+      coverImage: 'https://picsum.photos/seed/exp-completa/800/600',
+      images: [
+        'https://picsum.photos/seed/exp1/800/600',
+        'https://picsum.photos/seed/exp2/800/600',
+      ],
+      highlights: [
+        'Sesión de pre-cumpleaños personalizada',
+        'Cobertura fotográfica premium del evento',
+        'Álbum editorial de diseño exclusivo',
+      ],
+      eventPrice3h: 80000,
+      eventPrice4h: 100000,
+      comboDiscount: 20000,
+    },
+  });
+
+  // ─── Galería ────────────────────────────────────────────────────────
 
   await prisma.galleryImage.createMany({
     data: [
-      // Cake Smash (5 imágenes)
-      {
-        url: 'https://picsum.photos/seed/gal-cs1/800/1000',
-        alt: 'Bebé sonriendo con torta rosa',
-        caption: 'Cake Smash — Valentina, 1 año',
-        serviceSlug: 'cake-smash',
-        order: 1,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-cs2/800/600',
-        alt: 'Bebé con torta celeste y globos',
-        caption: 'Cake Smash — Mateo, 1 año',
-        serviceSlug: 'cake-smash',
-        order: 2,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-cs3/600/800',
-        alt: 'Primer mordisco de torta',
-        caption: null,
-        serviceSlug: 'cake-smash',
-        order: 3,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-cs4/800/800',
-        alt: 'Escenografía floral con bebé',
-        caption: 'Cake Smash temático jardín',
-        serviceSlug: 'cake-smash',
-        order: 4,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-cs5/800/600',
-        alt: 'Bebé cubierto de crema sonriendo',
-        caption: null,
-        serviceSlug: 'cake-smash',
-        order: 5,
-        isVisible: true,
-      },
-      // Fine Art (4 imágenes)
-      {
-        url: 'https://picsum.photos/seed/gal-fa1/800/1000',
-        alt: 'Retrato artístico con fondo pintado',
-        caption: 'Fine Art — Emma',
-        serviceSlug: 'fine-art',
-        order: 6,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-fa2/800/600',
-        alt: 'Bebé con luz lateral suave',
-        caption: 'Iluminación de estudio',
-        serviceSlug: 'fine-art',
-        order: 7,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-fa3/600/800',
-        alt: 'Retrato clásico blanco y negro',
-        caption: null,
-        serviceSlug: 'fine-art',
-        order: 8,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-fa4/800/800',
-        alt: 'Fine Art con props vintage',
-        caption: 'Fine Art — colección otoño',
-        serviceSlug: 'fine-art',
-        order: 9,
-        isVisible: true,
-      },
-      // Minimalista (3 imágenes)
-      {
-        url: 'https://picsum.photos/seed/gal-mn1/800/600',
-        alt: 'Bebé en fondo blanco puro',
-        caption: 'Minimalista — Sofía',
-        serviceSlug: 'minimalista',
-        order: 10,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-mn2/800/1000',
-        alt: 'Retrato minimalista luz natural',
-        caption: null,
-        serviceSlug: 'minimalista',
-        order: 11,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-mn3/800/800',
-        alt: 'Bebé sentado fondo neutro',
-        caption: 'La simpleza como arte',
-        serviceSlug: 'minimalista',
-        order: 12,
-        isVisible: true,
-      },
-      // Especiales y Estacionales (3 imágenes)
-      {
-        url: 'https://picsum.photos/seed/gal-se1/800/600',
-        alt: 'Sesión navideña con luces',
-        caption: 'Navidad 2025',
-        serviceSlug: 'especiales-estacionales',
-        order: 13,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-se2/600/800',
-        alt: 'Bebé con orejas de conejo Pascua',
-        caption: 'Pascua 2025',
-        serviceSlug: 'especiales-estacionales',
-        order: 14,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-se3/800/800',
-        alt: 'Halloween bebé calabaza',
-        caption: null,
-        serviceSlug: 'especiales-estacionales',
-        order: 15,
-        isVisible: true,
-      },
-      // Experiencia Completa (3 imágenes)
-      {
-        url: 'https://picsum.photos/seed/gal-ex1/800/1000',
-        alt: 'Jornada completa cambio de look',
-        caption: 'Experiencia Completa — Luca',
-        serviceSlug: 'experiencia-completa',
-        order: 16,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-ex2/800/600',
-        alt: 'Múltiples escenografías en un día',
-        caption: null,
-        serviceSlug: 'experiencia-completa',
-        order: 17,
-        isVisible: true,
-      },
-      {
-        url: 'https://picsum.photos/seed/gal-ex3/800/800',
-        alt: 'La experiencia premium MayuStudio',
-        caption: 'Lo mejor de cada sesión',
-        serviceSlug: 'experiencia-completa',
-        order: 18,
-        isVisible: true,
-      },
+      { url: 'https://picsum.photos/seed/g1/800/600', alt: 'Sesión Cake Smash Jungla', styleSlug: 'cake-smash', order: 1 },
+      { url: 'https://picsum.photos/seed/g2/800/1000', alt: 'Retrato Fine Art', styleSlug: 'fine-art', order: 2 },
+      { url: 'https://picsum.photos/seed/g3/800/800', alt: 'Sesión minimalista', styleSlug: 'minimalista', order: 3 },
+      { url: 'https://picsum.photos/seed/g4/800/600', alt: 'Cake Smash Princesa', styleSlug: 'cake-smash', order: 4 },
+      { url: 'https://picsum.photos/seed/g5/800/1000', alt: 'Retrato editorial infantil', styleSlug: 'fine-art', order: 5 },
+      { url: 'https://picsum.photos/seed/g6/800/800', alt: 'Sesión en fondo neutro', styleSlug: 'minimalista', order: 6 },
+      { url: 'https://picsum.photos/seed/g7/800/600', alt: 'Cake Smash Aventurero', styleSlug: 'cake-smash', order: 7 },
+      { url: 'https://picsum.photos/seed/g8/800/1200', alt: 'Fine Art con luz natural', styleSlug: 'fine-art', order: 8 },
+      { url: 'https://picsum.photos/seed/g9/800/600', alt: 'Sesión temática de primavera', order: 9 },
+      { url: 'https://picsum.photos/seed/g10/800/800', alt: 'Retrato espontáneo', order: 10 },
+      { url: 'https://picsum.photos/seed/g11/800/1000', alt: 'Bebé con torta artesanal', styleSlug: 'cake-smash', order: 11 },
+      { url: 'https://picsum.photos/seed/g12/800/600', alt: 'Sesión familiar completa', order: 12 },
+      { url: 'https://picsum.photos/seed/g13/800/800', alt: 'Retrato minimalista blanco', styleSlug: 'minimalista', order: 13 },
+      { url: 'https://picsum.photos/seed/g14/800/1000', alt: 'Fine Art oscuro dramático', styleSlug: 'fine-art', order: 14 },
+      { url: 'https://picsum.photos/seed/g15/800/600', alt: 'Set personalizado marinero', styleSlug: 'cake-smash', order: 15 },
+      { url: 'https://picsum.photos/seed/g16/800/800', alt: 'Sesión al aire libre', order: 16 },
+      { url: 'https://picsum.photos/seed/g17/800/1200', alt: 'Cobertura de evento cumpleaños', order: 17 },
+      { url: 'https://picsum.photos/seed/g18/800/600', alt: 'Día de las madres especial', styleSlug: 'dia-de-las-madres', order: 18 },
     ],
   });
 
-  console.log('Seed completado: 3 categorías, 5 servicios, 18 imágenes de galería');
+  console.log(
+    `Seed completado: 4 estilos (3 base + 1 estacional), 4 sets Cake Smash, 3 extras Minimalista, 1 config Experiencia Completa, 18 imágenes`,
+  );
 }
 
 main()
@@ -339,4 +253,6 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

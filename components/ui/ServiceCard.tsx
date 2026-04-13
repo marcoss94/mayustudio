@@ -27,13 +27,10 @@ export interface ServiceCardService {
   name: string;
   slug: string;
   shortDescription: string | null;
-  /** Precio en ARS como number (Decimal ya convertido en el servidor). */
-  price: number;
-  /** Duración de la sesión en minutos. */
-  duration: number;
+  price: number | null;
+  duration: number | null;
   coverImage: string | null;
   badge: string | null;
-  category: { name: string };
 }
 
 export interface ServiceCardProps {
@@ -55,7 +52,6 @@ export function ServiceCard({ service, priority = false, className }: ServiceCar
     duration,
     coverImage,
     badge,
-    category,
   } = service;
 
   const href = `/servicios/${slug}`;
@@ -106,12 +102,14 @@ export function ServiceCard({ service, priority = false, className }: ServiceCar
           </div>
         )}
 
-        {/* Categoría — bottom left de la imagen */}
-        <div className="absolute bottom-3 left-3">
-          <span className="label-caps text-[var(--color-inverse-on-surface)] opacity-90">
-            {category.name}
-          </span>
-        </div>
+        {/* Badge — bottom left de la imagen */}
+        {badge && (
+          <div className="absolute bottom-3 left-3">
+            <span className="label-caps text-[var(--color-inverse-on-surface)] opacity-90">
+              {badge}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* ── Contenido textual ── */}
@@ -130,12 +128,16 @@ export function ServiceCard({ service, priority = false, className }: ServiceCar
 
         {/* Precio + duración en fila */}
         <div className="flex items-center justify-between mt-auto pt-2">
-          <span className="font-serif text-headline-sm text-primary font-semibold">
-            {formatCurrency(price)}
-          </span>
-          <span className="label-caps text-[var(--color-on-surface-variant)]">
-            {duration} min
-          </span>
+          {price !== null && (
+            <span className="font-serif text-headline-sm text-primary font-semibold">
+              {formatCurrency(price)}
+            </span>
+          )}
+          {duration !== null && (
+            <span className="label-caps text-[var(--color-on-surface-variant)]">
+              {duration} min
+            </span>
+          )}
         </div>
 
         {/* CTA inline — accesible, aunque el card completo es clickable */}

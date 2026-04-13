@@ -13,14 +13,17 @@
 
 export type {
   User,
-  Service,
-  ServiceCategory,
+  Style,
+  StyleSet,
+  StyleExtra,
+  ExperienciaCompletaConfig,
   Reservation,
   Payment,
   GalleryImage,
   WebhookEvent,
   // Enums
   UserRole,
+  StyleType,
   ReservationStatus,
   PaymentStatus,
 } from '@prisma/client';

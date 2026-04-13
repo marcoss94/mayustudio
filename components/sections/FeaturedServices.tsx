@@ -12,10 +12,10 @@
 import Link from 'next/link';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ServiceCard } from '@/components/ui/ServiceCard';
-import { getFeaturedServices } from '@/lib/queries/services';
+import { getActiveStyles } from '@/lib/queries/services';
 
 export async function FeaturedServices() {
-  const services = await getFeaturedServices(3);
+  const services = await getActiveStyles();
 
   return (
     <section className="px-4 py-16 sm:px-6 lg:px-8 lg:py-24" aria-label="Servicios destacados">

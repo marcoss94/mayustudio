@@ -6,7 +6,7 @@
 
 import type { Metadata } from 'next';
 import { getGalleryImages } from '@/lib/queries/gallery';
-import { getServiceSlugs } from '@/lib/queries/services';
+import { getStyleSlugs } from '@/lib/queries/services';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { GalleryGrid } from '@/components/sections/GalleryGrid';
 
@@ -26,7 +26,7 @@ export default async function GaleriaPage() {
   // Queries paralelas
   const [images, services] = await Promise.all([
     getGalleryImages(),
-    getServiceSlugs(),
+    getStyleSlugs(),
   ]);
 
   return (
