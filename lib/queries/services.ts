@@ -9,6 +9,51 @@ import { cache } from 'react';
 import { prisma } from '@/lib/db/client';
 import type { StyleType } from '@prisma/client';
 
+// ─── Tipos auxiliares ────────────────────────────────────────────────────────
+
+export interface StyleSetDetail {
+  id: string;
+  styleId: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  coverImage: string | null;
+  images: string[];
+  standardPrice: number;
+  premiumPrice: number;
+  isCustom: boolean;
+  customPrice: number | null;
+  isActive: boolean;
+  displayOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface StyleExtraDetail {
+  id: string;
+  styleId: string;
+  name: string;
+  price: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface StyleDetail extends Omit<StyleSummary, 'type'> {
+  type: StyleType;
+  description: string | null;
+  images: string[];
+  seasonStart: Date | null;
+  seasonEnd: Date | null;
+  isActive: boolean;
+  isVisible: boolean;
+  displayOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+  sets: StyleSetDetail[];
+  extras: StyleExtraDetail[];
+}
+
 // ─── Tipos de retorno ────────────────────────────────────────────────────────
 
 export interface StyleSummary {
@@ -111,7 +156,7 @@ export const getSeasonalStyles = cache(async () => {
 /**
  * Estilo individual por slug con sets y extras.
  */
-export const getStyleBySlug = cache(async (slug: string) => {
+export const getStyleBySlug = cache(async (slug: string): Promise<StyleDetail | null> => {
   try {
     const style = await prisma.style.findFirst({
       where: { slug, isActive: true, isVisible: true },
