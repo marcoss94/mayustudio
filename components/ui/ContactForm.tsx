@@ -341,9 +341,9 @@ export function ContactForm({ services }: ContactFormProps) {
           disabled={isPending}
           aria-busy={isPending}
           className={cn(
-            'btn-primary w-full px-8 py-3.5',
+            'btn-primary w-full px-6 py-2.5',
             'font-sans text-base font-medium',
-            'min-h-[48px]',
+            'min-h-[44px]',
             'flex items-center justify-center gap-2',
             'transition-all duration-200',
             'active:scale-[0.98]',

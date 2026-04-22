@@ -9,6 +9,7 @@ import { MobileNav } from './MobileNav';
 const navLinks = [
   { href: '/', label: 'Inicio' },
   { href: '/servicios', label: 'Estilos' },
+  { href: '/especiales', label: 'Especiales' },
   { href: '/galeria', label: 'Galería' },
   { href: '/contacto', label: 'Contacto' },
 ];
@@ -61,7 +62,7 @@ export function Header() {
             </Link>
             <Link
               href="/reservar"
-              className="hidden md:flex bg-primary text-on-primary px-8 py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] active:scale-95 min-h-[44px] items-center"
+              className="hidden md:flex bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] active:scale-95 items-center"
             >
               Reservar sesión
             </Link>

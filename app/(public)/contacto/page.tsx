@@ -32,7 +32,7 @@ function MailIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
-      className="h-5 w-5 shrink-0 text-primary"
+      className="text-primary h-5 w-5 shrink-0"
       aria-hidden="true"
     >
       <path
@@ -52,7 +52,7 @@ function PhoneIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
-      className="h-5 w-5 shrink-0 text-primary"
+      className="text-primary h-5 w-5 shrink-0"
       aria-hidden="true"
     >
       <path
@@ -72,7 +72,7 @@ function ClockIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
-      className="h-5 w-5 shrink-0 text-primary"
+      className="text-primary h-5 w-5 shrink-0"
       aria-hidden="true"
     >
       <path
@@ -90,7 +90,7 @@ function InstagramIcon() {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="currentColor"
-      className="h-5 w-5 shrink-0 text-primary"
+      className="text-primary h-5 w-5 shrink-0"
       aria-hidden="true"
     >
       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
@@ -106,7 +106,7 @@ export default async function ContactoPage() {
   return (
     <main className="min-h-[100dvh]">
       {/* Header */}
-      <section className="px-4 pb-12 pt-16 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
+      <section className="px-4 pt-16 pb-12 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
         <div className="mx-auto max-w-7xl">
           <SectionHeader
             title="Hablemos"
@@ -120,13 +120,10 @@ export default async function ContactoPage() {
       <section className="px-4 pb-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-5 lg:gap-16">
-
             {/* Formulario — 3/5 del ancho en desktop */}
             <div className="lg:col-span-3">
-              <div className="glass-card px-6 py-8 sm:px-8 sm:py-10">
-                <h2 className="mb-8 font-serif text-xl text-on-surface">
-                  Enviar un mensaje
-                </h2>
+              <div className="bg-surface-container-lowest rounded-2xl px-6 py-8 shadow-[0_20px_40px_rgba(63,43,34,0.06)] sm:px-8 sm:py-10">
+                <h2 className="text-on-surface mb-8 font-serif text-xl">Enviar un mensaje</h2>
                 <ContactForm services={services} />
               </div>
             </div>
@@ -134,10 +131,9 @@ export default async function ContactoPage() {
             {/* Información de contacto — 2/5 en desktop */}
             <aside className="lg:col-span-2">
               <div className="space-y-8">
-
                 {/* Datos de contacto */}
-                <div className="glass-card px-6 py-8">
-                  <h2 className="mb-6 font-serif text-lg text-on-surface">
+                <div className="bg-surface-container-lowest rounded-2xl px-6 py-8 shadow-[0_20px_40px_rgba(63,43,34,0.06)]">
+                  <h2 className="text-on-surface mb-6 font-serif text-lg">
                     Información de contacto
                   </h2>
 
@@ -150,7 +146,7 @@ export default async function ContactoPage() {
                         </p>
                         <a
                           href="mailto:hola@mayustudio.com"
-                          className="font-sans text-sm text-on-surface transition-colors hover:text-primary"
+                          className="text-on-surface hover:text-primary font-sans text-sm transition-colors"
                         >
                           hola@mayustudio.com
                         </a>
@@ -167,7 +163,7 @@ export default async function ContactoPage() {
                           href="https://wa.me/5491100000000"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-sans text-sm text-on-surface transition-colors hover:text-primary"
+                          className="text-on-surface hover:text-primary font-sans text-sm transition-colors"
                         >
                           +54 9 11 0000-0000
                         </a>
@@ -184,7 +180,7 @@ export default async function ContactoPage() {
                           href="https://instagram.com/mayustudio"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-sans text-sm text-on-surface transition-colors hover:text-primary"
+                          className="text-on-surface hover:text-primary font-sans text-sm transition-colors"
                         >
                           @mayustudio
                         </a>
@@ -194,12 +190,10 @@ export default async function ContactoPage() {
                 </div>
 
                 {/* Horarios */}
-                <div className="glass-card px-6 py-8">
+                <div className="bg-surface-container-lowest rounded-2xl px-6 py-8 shadow-[0_20px_40px_rgba(63,43,34,0.06)]">
                   <div className="mb-4 flex items-center gap-2">
                     <ClockIcon />
-                    <h2 className="font-serif text-lg text-on-surface">
-                      Horarios de sesión
-                    </h2>
+                    <h2 className="text-on-surface font-serif text-lg">Horarios de sesión</h2>
                   </div>
 
                   <ul className="space-y-3" role="list">
@@ -207,7 +201,7 @@ export default async function ContactoPage() {
                       <span className="font-sans text-sm text-[color:var(--color-on-surface-variant)]">
                         Lunes a viernes
                       </span>
-                      <span className="font-sans text-sm font-medium text-on-surface">
+                      <span className="text-on-surface font-sans text-sm font-medium">
                         9:00 — 17:00
                       </span>
                     </li>
@@ -215,7 +209,7 @@ export default async function ContactoPage() {
                       <span className="font-sans text-sm text-[color:var(--color-on-surface-variant)]">
                         Sábados
                       </span>
-                      <span className="font-sans text-sm font-medium text-on-surface">
+                      <span className="text-on-surface font-sans text-sm font-medium">
                         9:00 — 13:00
                       </span>
                     </li>
@@ -230,15 +224,15 @@ export default async function ContactoPage() {
                   </ul>
 
                   <p className="mt-4 font-sans text-xs text-[color:var(--color-on-surface-variant)]/70">
-                    Las sesiones duran entre 40 y 120 minutos según el servicio.
-                    Coordinamos el horario exacto al confirmar la reserva.
+                    Las sesiones duran entre 40 y 120 minutos según el servicio. Coordinamos el
+                    horario exacto al confirmar la reserva.
                   </p>
                 </div>
 
                 {/* Ubicación placeholder */}
                 <div className="overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-glass-border)]">
                   <div
-                    className="flex h-40 items-center justify-center bg-surface-container"
+                    className="bg-surface-container flex h-40 items-center justify-center"
                     aria-label="Mapa de ubicación — próximamente"
                     role="img"
                   >
@@ -272,7 +266,6 @@ export default async function ContactoPage() {
                     </div>
                   </div>
                 </div>
-
               </div>
             </aside>
           </div>

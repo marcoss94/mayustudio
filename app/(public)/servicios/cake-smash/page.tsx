@@ -5,6 +5,7 @@ import { getStyleBySlug } from '@/lib/queries/services';
 import { getGalleryImages } from '@/lib/queries/gallery';
 import { formatCurrency } from '@/lib/utils';
 import { Cake, Palette } from 'lucide-react';
+import { HowItWorks, FAQ } from '@/components/sections';
 
 export const metadata: Metadata = {
   title: 'Cake Smash',
@@ -88,7 +89,7 @@ export default async function CakeSmashPage() {
               </p>
               <Link
                 href="/servicios/cake-smash/personalizado"
-                className="bg-on-primary text-primary px-8 md:px-10 py-3.5 md:py-4 rounded-full font-bold hover:opacity-90 transition-all duration-300 min-h-[48px] flex items-center active:scale-[0.98]"
+                className="bg-on-primary text-primary px-6 md:px-7 py-2.5 md:py-3 rounded-full font-bold hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
               >
                 Solicitar set personalizado
               </Link>
@@ -191,70 +192,24 @@ export default async function CakeSmashPage() {
         </section>
       )}
 
-      {/* ─── Cómo funciona ─────────────────────────────────────────────── */}
-      <section className="py-20 md:py-32 px-4 md:px-12">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="font-serif text-3xl md:text-4xl text-center mb-16 md:mb-20">
-            ¿Cómo funciona?
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-            {[
-              { n: '1', title: 'Reserva', desc: 'Elige tu fecha y pack ideal online en pocos clics.' },
-              { n: '2', title: 'Planificación', desc: 'Hablamos sobre la temática y detalles del set.' },
-              { n: '3', title: 'La Sesión', desc: 'Día de juegos, risas y, por supuesto, pastel.' },
-              { n: '4', title: 'Entrega', desc: 'Recibe tus recuerdos en formato digital y físico.' },
-            ].map((step) => (
-              <div key={step.n} className="text-center group">
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-surface-container mx-auto mb-6 flex items-center justify-center text-primary font-serif text-xl md:text-2xl group-hover:bg-primary group-hover:text-on-primary transition-all">
-                  {step.n}
-                </div>
-                <h4 className="font-bold mb-2 md:mb-3">{step.title}</h4>
-                <p className="text-sm text-on-surface-variant">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HowItWorks
+        title="¿Cómo funciona?"
+        steps={[
+          { n: '1', title: 'Reserva', desc: 'Elige tu fecha y pack ideal online en pocos clics.' },
+          { n: '2', title: 'Planificación', desc: 'Hablamos sobre la temática y detalles del set.' },
+          { n: '3', title: 'La Sesión', desc: 'Día de juegos, risas y, por supuesto, pastel.' },
+          { n: '4', title: 'Entrega', desc: 'Recibe tus recuerdos en formato digital y físico.' },
+        ]}
+      />
 
-      {/* ─── FAQ ───────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-32 px-4 md:px-12 bg-surface">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-serif text-3xl md:text-4xl text-center mb-12 md:mb-16">
-            Preguntas frecuentes
-          </h2>
-          <div className="space-y-4">
-            {[
-              { q: '¿Cuándo debo reservar la sesión?', a: 'Recomendamos reservar con 1 o 2 meses de antelación, especialmente si deseas un set personalizado.' },
-              { q: '¿Incluyen el pastel en la sesión?', a: 'Sí, todos nuestros packs incluyen el pastel artesanal coordinado con la temática elegida.' },
-              { q: '¿Qué pasa si mi bebé tiene alergias?', a: 'Nuestros pasteles son orgánicos y adaptables. Nos informas con antelación y ajustamos ingredientes según las necesidades de tu bebé.' },
-              { q: '¿Pueden participar los padres o hermanos?', a: 'Por supuesto. Incluimos algunas tomas familiares al inicio de la sesión sin costo adicional.' },
-            ].map((faq, i) => (
-              <details
-                key={faq.q}
-                className="group bg-surface-container rounded-xl overflow-hidden"
-                open={i === 0}
-              >
-                <summary className="list-none flex justify-between items-center p-6 cursor-pointer font-semibold text-base md:text-lg hover:bg-surface-container-high transition-colors min-h-[44px]">
-                  {faq.q}
-                  <svg
-                    className="w-5 h-5 shrink-0 ml-4 text-on-surface-variant group-open:rotate-180 transition-transform"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="p-6 pt-0 text-on-surface-variant leading-relaxed">
-                  {faq.a}
-                </div>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FAQ
+        items={[
+          { q: '¿Cuándo debo reservar la sesión?', a: 'Recomendamos reservar con 1 o 2 meses de antelación, especialmente si deseas un set personalizado.' },
+          { q: '¿Incluyen el pastel en la sesión?', a: 'Sí, todos nuestros packs incluyen el pastel artesanal coordinado con la temática elegida.' },
+          { q: '¿Qué pasa si mi bebé tiene alergias?', a: 'Nuestros pasteles son orgánicos y adaptables. Nos informas con antelación y ajustamos ingredientes según las necesidades de tu bebé.' },
+          { q: '¿Pueden participar los padres o hermanos?', a: 'Por supuesto. Incluimos algunas tomas familiares al inicio de la sesión sin costo adicional.' },
+        ]}
+      />
 
       {/* ─── CTA final ─────────────────────────────────────────────────── */}
       <section className="py-24 md:py-32 px-4 md:px-8 text-center bg-primary text-on-primary">
@@ -269,13 +224,13 @@ export default async function CakeSmashPage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link
               href="/reservar"
-              className="bg-on-primary text-primary px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-lg hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[48px] flex items-center active:scale-[0.98]"
+              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
             >
               Reservar Cake Smash
             </Link>
             <Link
               href="/contacto"
-              className="bg-transparent border-2 border-on-primary px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-lg hover:opacity-90 transition-all duration-300 min-h-[48px] flex items-center active:scale-[0.98]"
+              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
             >
               Enviar consulta directa
             </Link>

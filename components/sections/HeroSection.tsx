@@ -71,7 +71,7 @@ export function HeroSection({
           <div className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-10">
             <Link
               href={ctaPrimary.href}
-              className="btn-primary inline-flex min-h-[48px] items-center justify-center px-8 py-3 text-base font-medium text-on-primary"
+              className="btn-primary inline-flex min-h-[44px] items-center justify-center px-8 py-3 text-base font-medium text-on-primary"
             >
               {ctaPrimary.label}
             </Link>
@@ -79,7 +79,7 @@ export function HeroSection({
             {ctaSecondary && (
               <Link
                 href={ctaSecondary.href}
-                className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/40 bg-white/10 px-8 py-3 text-base font-medium text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/40 bg-white/10 px-8 py-3 text-base font-medium text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
               >
                 {ctaSecondary.label}
               </Link>

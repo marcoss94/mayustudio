@@ -106,15 +106,18 @@ model Style {
   description      String?   @db.Text
   shortDescription String?   @db.VarChar(200)
   coverImage       String?
-  images           String[]
   highlights       String[]
   badge            String?   @db.VarChar(30)
   label            String?   @db.VarChar(50)  // ej: "Celebración Vibrante", "Legado Artístico"
-  accentColor      String?   @db.VarChar(7)   // hex ej: "#8c4f13" — para checks y labels
   duration         Int?      // minutos (para estilos con duración fija)
   price            Decimal?  @db.Decimal(10, 2) // solo para STANDARD y SEASONAL
-  minChildAge      Int?      // meses
-  maxChildAge      Int?      // meses
+  // Tier details (solo para SETS_AND_TIERS)
+  tierStandardHighlights String[]
+  tierPremiumHighlights  String[]
+  tierStandardDuration   Int?
+  tierPremiumDuration    Int?
+  tierStandardTagline    String? @db.VarChar(80)
+  tierPremiumTagline     String? @db.VarChar(80)
   isActive         Boolean   @default(true)
   isVisible        Boolean   @default(true)
   displayOrder     Int       @default(0)

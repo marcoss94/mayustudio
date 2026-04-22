@@ -123,7 +123,7 @@ export default async function EstilosPage() {
                 )}
                 <Link
                   href={`/servicios/${style.slug}`}
-                  className="bg-primary text-on-primary inline-flex min-h-[48px] items-center rounded-full px-8 py-3.5 font-sans text-sm font-semibold tracking-widest uppercase shadow-[0_20px_40px_rgba(63,43,34,0.06)] transition-all hover:opacity-90 active:scale-[0.98] md:px-10 md:py-4"
+                  className="bg-primary text-on-primary inline-flex min-h-[44px] items-center rounded-full px-6 py-2.5 font-sans text-sm font-semibold tracking-widest uppercase shadow-[0_20px_40px_rgba(63,43,34,0.06)] transition-all hover:opacity-90 active:scale-[0.98] md:px-8 md:py-3"
                 >
                   Ver detalles de {style.name}
                 </Link>
@@ -146,13 +146,13 @@ export default async function EstilosPage() {
           <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
             <Link
               href="/reservar"
-              className="bg-on-primary text-primary flex min-h-[48px] items-center rounded-full px-10 py-4 text-lg font-bold shadow-[0_20px_40px_rgba(63,43,34,0.12)] transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-12 md:py-5"
+              className="bg-on-primary text-primary flex min-h-[44px] items-center rounded-full px-6 py-2.5 text-base font-semibold shadow-[0_20px_40px_rgba(63,43,34,0.12)] transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-8 md:py-3"
             >
               Reservar sesión ahora
             </Link>
             <Link
               href="/contacto"
-              className="border-on-primary flex min-h-[48px] items-center rounded-full border-2 bg-transparent px-10 py-4 text-lg font-bold transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-12 md:py-5"
+              className="border-on-primary flex min-h-[44px] items-center rounded-full border-2 bg-transparent px-6 py-2.5 text-base font-semibold transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-8 md:py-3"
             >
               Enviar consulta directa
             </Link>

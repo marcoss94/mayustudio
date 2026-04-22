@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Paintbrush, Aperture, Palette, CalendarHeart } from 'lucide-react';
-import { getActiveStyles } from '@/lib/queries/services';
+import { HowItWorks, FAQ, SpecialsBanner } from '@/components/sections';
+import { getActiveStyles, getSeasonalStyles } from '@/lib/queries/services';
 import { getGalleryImages } from '@/lib/queries/gallery';
 import { websiteJsonLd, localBusinessJsonLd } from '@/lib/seo/json-ld';
 
@@ -13,10 +14,18 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [styles, galleryImages] = await Promise.all([
+  const [styles, galleryImages, seasonals] = await Promise.all([
     getActiveStyles(),
     getGalleryImages(),
+    getSeasonalStyles(),
   ]);
+
+  const bannerSpecials = seasonals.map((s) => ({
+    slug: s.slug,
+    name: s.name,
+    coverImage: s.coverImage,
+    badge: s.badge,
+  }));
 
   // Los 3 estilos base para "Nuestros Estilos"
   const featuredStyles = styles.slice(0, 3);
@@ -33,30 +42,8 @@ export default async function HomePage() {
         }}
       />
 
-      {/* ─── 1. Banner especiales ──────────────────────────────────────── */}
-      <section className="px-4 md:px-8 mb-8 max-w-screen-2xl mx-auto">
-        <Link href="/servicios" className="group block">
-          <div className="relative overflow-hidden rounded-2xl aspect-[21/8] md:aspect-[35/7]">
-            <Image
-              src="https://picsum.photos/seed/navidad-mayu/1600/400"
-              alt="Sesión especial de Navidad en MayuStudio"
-              fill
-              className="object-cover transition-transform duration-1000 group-hover:scale-105"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#3f2b22]/40 to-transparent" />
-            <div className="absolute inset-0 flex items-center px-8 md:px-12">
-              <div className="text-white">
-                <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-2">
-                  Especiales
-                </p>
-                <h3 className="font-serif text-3xl md:text-6xl mb-4">Navidad</h3>
-                <div className="h-1 w-12 bg-white rounded-full" />
-              </div>
-            </div>
-          </div>
-        </Link>
-      </section>
+      {/* ─── 1. Banner especiales (dinámico) ────────────────────────────── */}
+      <SpecialsBanner specials={bannerSpecials} />
 
       {/* ─── 2. Hero ───────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden mb-16 md:mb-24 px-4 md:px-8 max-w-screen-2xl mx-auto">
@@ -83,13 +70,13 @@ export default async function HomePage() {
           <div className="flex flex-col gap-3">
             <Link
               href="/servicios"
-              className="bg-primary text-on-primary px-8 py-3.5 rounded-full font-medium text-base hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[48px] flex items-center justify-center active:scale-[0.98]"
+              className="bg-primary text-on-primary px-6 py-2.5 rounded-full font-medium text-sm hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
             >
               Ver estilos
             </Link>
             <Link
               href="/reservar"
-              className="bg-white text-primary border-2 border-primary-container px-8 py-3.5 rounded-full font-medium text-base hover:bg-surface transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[48px] flex items-center justify-center active:scale-[0.98]"
+              className="bg-white text-primary border-2 border-primary-container px-6 py-2.5 rounded-full font-medium text-sm hover:bg-surface transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
             >
               Reservar sesión
             </Link>
@@ -121,13 +108,13 @@ export default async function HomePage() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/servicios"
-                  className="bg-primary text-on-primary px-10 py-4 rounded-full font-medium text-lg hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center"
+                  className="bg-primary text-on-primary px-8 py-3 rounded-full font-medium hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center"
                 >
                   Ver estilos
                 </Link>
                 <Link
                   href="/reservar"
-                  className="bg-white text-primary border-2 border-primary-container px-10 py-4 rounded-full font-medium text-lg hover:bg-surface transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center"
+                  className="bg-white text-primary border-2 border-primary-container px-8 py-3 rounded-full font-medium hover:bg-surface transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center"
                 >
                   Reservar sesión
                 </Link>
@@ -243,7 +230,7 @@ export default async function HomePage() {
             </ul>
             <Link
               href="/experiencia-completa"
-              className="bg-primary text-on-primary px-10 py-4 rounded-full font-medium text-lg hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] inline-flex items-center min-h-[44px]"
+              className="bg-primary text-on-primary px-8 py-3 rounded-full font-medium hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] inline-flex items-center min-h-[44px]"
             >
               Conocer la experiencia
             </Link>
@@ -251,29 +238,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── 6. Cómo funciona ──────────────────────────────────────────── */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-screen-2xl mx-auto text-center">
-        <h2 className="font-serif text-3xl md:text-5xl mb-12 md:mb-16 italic">
-          ¿Cómo funciona?
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 relative">
-          {[
-            { n: '1', title: 'Elige un estilo', desc: 'Explora nuestras propuestas artísticas y selecciona la que mejor conecte con tu visión.' },
-            { n: '2', title: 'Personaliza tu experiencia', desc: 'Coordinamos detalles, vestuario y paleta de colores para una sesión a medida.' },
-            { n: '3', title: 'Reserva tu fecha', desc: 'Asegura tu lugar en nuestro calendario y prepárate para crear magia juntos.' },
-          ].map((step) => (
-            <div key={step.n} className="relative z-10">
-              <div className="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_20px_40px_rgba(63,43,34,0.06)] text-primary text-3xl font-serif italic">
-                {step.n}
-              </div>
-              <h3 className="text-xl font-bold mb-4">{step.title}</h3>
-              <p className="text-on-surface-variant px-4">{step.desc}</p>
-            </div>
-          ))}
-          {/* Línea conectora desktop */}
-          <div className="hidden md:block absolute top-10 left-[20%] right-[20%] h-[1px] bg-outline-variant/30 -z-0" />
-        </div>
-      </section>
+      <HowItWorks
+        title="¿Cómo funciona?"
+        steps={[
+          { n: '1', title: 'Elige un estilo', desc: 'Explora nuestras propuestas artísticas y selecciona la que mejor conecte con tu visión.' },
+          { n: '2', title: 'Personaliza tu experiencia', desc: 'Coordinamos detalles, vestuario y paleta de colores para una sesión a medida.' },
+          { n: '3', title: 'Reserva tu fecha', desc: 'Asegura tu lugar en nuestro calendario y prepárate para crear magia juntos.' },
+        ]}
+      />
 
       {/* ─── 7. Testimonios ────────────────────────────────────────────── */}
       <section className="py-20 md:py-24 bg-surface">
@@ -312,42 +284,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── 8. FAQ ────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-3xl mx-auto">
-        <h2 className="font-serif text-3xl mb-12 text-center italic">
-          Preguntas frecuentes
-        </h2>
-        <div className="space-y-4">
-          {[
-            { q: '¿Con cuánta antelación debo reservar?', a: 'Recomendamos reservar con al menos 4 a 6 semanas de antelación, especialmente para sesiones de temporada o fines de semana, ya que nuestro calendario suele completarse rápido.' },
-            { q: '¿Ofrecen vestuario para las sesiones?', a: 'Sí, contamos con un "clóset editorial" con prendas seleccionadas en tonos neutros y fibras naturales (lino, algodón) para niños de 0 a 5 años, asegurando que el estilo sea coherente.' },
-            { q: '¿Cómo es el proceso de entrega?', a: 'Tras la sesión, recibirás una galería online para seleccionar tus favoritas. Una vez elegidas, el proceso de edición fina toma entre 10 y 15 días hábiles para garantizar la máxima calidad editorial.' },
-          ].map((faq, i) => (
-            <details
-              key={faq.q}
-              className="group bg-surface-container rounded-xl overflow-hidden"
-              open={i === 0}
-            >
-              <summary className="list-none flex justify-between items-center p-6 cursor-pointer font-semibold text-base md:text-lg hover:bg-surface-container-high transition-colors min-h-[44px]">
-                {faq.q}
-                <svg
-                  className="w-5 h-5 shrink-0 ml-4 text-on-surface-variant group-open:rotate-180 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div className="p-6 pt-0 text-on-surface-variant leading-relaxed">
-                {faq.a}
-              </div>
-            </details>
-          ))}
-        </div>
-      </section>
+      <FAQ
+        items={[
+          { q: '¿Con cuánta antelación debo reservar?', a: 'Recomendamos reservar con al menos 4 a 6 semanas de antelación, especialmente para sesiones de temporada o fines de semana, ya que nuestro calendario suele completarse rápido.' },
+          { q: '¿Ofrecen vestuario para las sesiones?', a: 'Sí, contamos con un "clóset editorial" con prendas seleccionadas en tonos neutros y fibras naturales (lino, algodón) para niños de 0 a 5 años, asegurando que el estilo sea coherente.' },
+          { q: '¿Cómo es el proceso de entrega?', a: 'Tras la sesión, recibirás una galería online para seleccionar tus favoritas. Una vez elegidas, el proceso de edición fina toma entre 10 y 15 días hábiles para garantizar la máxima calidad editorial.' },
+        ]}
+      />
 
       {/* ─── 9. CTA final ──────────────────────────────────────────────── */}
       <section className="py-24 md:py-32 px-4 md:px-8 text-center bg-primary text-on-primary">
@@ -362,13 +305,13 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link
               href="/reservar"
-              className="bg-on-primary text-primary px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-lg hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[48px] flex items-center active:scale-[0.98]"
+              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
             >
               Reservar sesión ahora
             </Link>
             <Link
               href="/contacto"
-              className="bg-transparent border-2 border-on-primary px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-lg hover:opacity-90 transition-all duration-300 min-h-[48px] flex items-center active:scale-[0.98]"
+              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
             >
               Enviar consulta directa
             </Link>

@@ -288,13 +288,13 @@ export default function SobreMiPage() {
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/contacto"
-              className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center px-10 py-3 font-sans text-base font-semibold text-on-primary active:scale-[0.98] sm:w-auto"
+              className="btn-primary inline-flex min-h-[44px] w-full items-center justify-center px-6 py-2.5 font-sans text-sm font-semibold text-on-primary active:scale-[0.98] sm:w-auto"
             >
               Contactarme
             </Link>
             <Link
               href="/servicios"
-              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border-2 border-primary/30 px-10 py-3 font-sans text-base font-semibold text-primary transition-all duration-200 hover:border-primary/60 hover:bg-primary/5 active:scale-[0.98] sm:w-auto"
+              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border-2 border-primary/30 px-6 py-2.5 font-sans text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/60 hover:bg-primary/5 active:scale-[0.98] sm:w-auto"
             >
               Ver sesiones
             </Link>

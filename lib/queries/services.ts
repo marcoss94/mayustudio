@@ -42,12 +42,17 @@ export interface StyleExtraDetail {
 export interface StyleDetail extends Omit<StyleSummary, 'type'> {
   type: StyleType;
   description: string | null;
-  images: string[];
   seasonStart: Date | null;
   seasonEnd: Date | null;
   isActive: boolean;
   isVisible: boolean;
   displayOrder: number;
+  tierStandardHighlights: string[];
+  tierPremiumHighlights: string[];
+  tierStandardDuration: number | null;
+  tierPremiumDuration: number | null;
+  tierStandardTagline: string | null;
+  tierPremiumTagline: string | null;
   createdAt: Date;
   updatedAt: Date;
   sets: StyleSetDetail[];
@@ -68,9 +73,6 @@ export interface StyleSummary {
   badge: string | null;
   highlights: string[];
   label: string | null;
-  accentColor: string | null;
-  minChildAge: number | null;
-  maxChildAge: number | null;
 }
 
 /**
@@ -97,9 +99,6 @@ export const getActiveStyles = cache(async (includeSeasonal = false): Promise<St
         badge: true,
         highlights: true,
         label: true,
-        accentColor: true,
-        minChildAge: true,
-        maxChildAge: true,
       },
       orderBy: { displayOrder: 'asc' },
     });

@@ -32,14 +32,7 @@ async function main() {
         'Celebramos el primer año con una sesión divertida, llena de texturas y mucha espontaneidad. Cada set está diseñado para crear un mundo mágico alrededor de tu bebé.',
       shortDescription:
         'Celebramos el primer año con sets temáticos únicos y mucha espontaneidad.',
-      label: 'Celebración Vibrante',
-      accentColor: '#8c4f13',
-      coverImage: 'https://picsum.photos/seed/cake-smash-cover/800/600',
-      images: [
-        'https://picsum.photos/seed/cs1/800/600',
-        'https://picsum.photos/seed/cs2/800/600',
-      ],
-      highlights: [
+      label: 'Celebración Vibrante',      coverImage: 'https://picsum.photos/seed/cake-smash-cover/800/600',      highlights: [
         'Torta artesanal incluida',
         'Decoración temática completa',
         'Vestuario a elección',
@@ -47,9 +40,24 @@ async function main() {
       ],
       badge: 'Más popular',
       duration: 60,
-      minChildAge: 11,
-      maxChildAge: 13,
       displayOrder: 1,
+      tierStandardDuration: 45,
+      tierPremiumDuration: 90,
+      tierStandardTagline: 'Minimalismo Orgánico',
+      tierPremiumTagline: 'Inmersión Editorial Total',
+      tierStandardHighlights: [
+        'Set a elegir de catálogo',
+        '15 fotos digitales editadas',
+        'Galería online privada',
+        'Torta artesanal incluida',
+      ],
+      tierPremiumHighlights: [
+        'Set premium o personalizado',
+        '30 fotos digitales editadas',
+        'Sesión "Splash" (baño en tina)',
+        'Álbum impreso + USB de madera',
+        'Galería online privada',
+      ],
     },
   });
 
@@ -62,14 +70,7 @@ async function main() {
         'Retratos de inspiración pictórica donde cada luz y sombra es cuidadosamente esculpida. Una experiencia artística que transforma momentos en obras de arte.',
       shortDescription:
         'Retratos de inspiración pictórica con luz y sombra esculpida.',
-      label: 'Legado Artístico',
-      accentColor: '#735640',
-      coverImage: 'https://picsum.photos/seed/fine-art-cover/800/600',
-      images: [
-        'https://picsum.photos/seed/fa1/800/600',
-        'https://picsum.photos/seed/fa2/800/600',
-      ],
-      highlights: [
+      label: 'Legado Artístico',      coverImage: 'https://picsum.photos/seed/fine-art-cover/800/600',      highlights: [
         'Dirección artística completa',
         'Iluminación de estudio profesional',
         'Edición fine art detallada',
@@ -90,14 +91,7 @@ async function main() {
         'La belleza de lo simple. Fondos neutros que permiten que la personalidad sea la protagonista. Ideal para capturar la esencia pura de tu hijo.',
       shortDescription:
         'La belleza de lo simple. Fondos neutros, protagonismo total.',
-      label: 'Menos es Más',
-      accentColor: '#456431',
-      coverImage: 'https://picsum.photos/seed/minimalista-cover/800/600',
-      images: [
-        'https://picsum.photos/seed/min1/800/600',
-        'https://picsum.photos/seed/min2/800/600',
-      ],
-      highlights: [
+      label: 'Menos es Más',      coverImage: 'https://picsum.photos/seed/minimalista-cover/800/600',      highlights: [
         'Fondo neutro profesional',
         'Vestuario en tonos naturales',
         'Edición limpia y elegante',
@@ -119,6 +113,14 @@ async function main() {
         slug: 'jungla',
         description: 'Set tropical con plantas, animales y colores vibrantes.',
         coverImage: 'https://picsum.photos/seed/set-jungla/800/600',
+        images: [
+          'https://picsum.photos/seed/jungla-1/600/750',
+          'https://picsum.photos/seed/jungla-2/600/750',
+          'https://picsum.photos/seed/jungla-3/600/750',
+          'https://picsum.photos/seed/jungla-4/600/750',
+          'https://picsum.photos/seed/jungla-5/600/750',
+          'https://picsum.photos/seed/jungla-6/600/750',
+        ],
         standardPrice: 40000,
         premiumPrice: 55000,
         displayOrder: 1,
@@ -129,6 +131,14 @@ async function main() {
         slug: 'princesa',
         description: 'Set de fantasía con coronas, tules y tonos pastel.',
         coverImage: 'https://picsum.photos/seed/set-princesa/800/600',
+        images: [
+          'https://picsum.photos/seed/princesa-1/600/750',
+          'https://picsum.photos/seed/princesa-2/600/750',
+          'https://picsum.photos/seed/princesa-3/600/750',
+          'https://picsum.photos/seed/princesa-4/600/750',
+          'https://picsum.photos/seed/princesa-5/600/750',
+          'https://picsum.photos/seed/princesa-6/600/750',
+        ],
         standardPrice: 42000,
         premiumPrice: 58000,
         displayOrder: 2,
@@ -139,6 +149,14 @@ async function main() {
         slug: 'aventurero',
         description: 'Set rústico con elementos de exploración y naturaleza.',
         coverImage: 'https://picsum.photos/seed/set-aventurero/800/600',
+        images: [
+          'https://picsum.photos/seed/aventurero-1/600/750',
+          'https://picsum.photos/seed/aventurero-2/600/750',
+          'https://picsum.photos/seed/aventurero-3/600/750',
+          'https://picsum.photos/seed/aventurero-4/600/750',
+          'https://picsum.photos/seed/aventurero-5/600/750',
+          'https://picsum.photos/seed/aventurero-6/600/750',
+        ],
         standardPrice: 40000,
         premiumPrice: 55000,
         displayOrder: 3,
@@ -179,9 +197,7 @@ async function main() {
       description:
         'Una sesión especial para celebrar el vínculo único entre mamá e hijo. Disponible solo en temporada.',
       shortDescription: 'Celebrá el vínculo mamá e hijo con una sesión única.',
-      label: 'Temporada Especial',
-      accentColor: '#8c4f13',
-      coverImage: 'https://picsum.photos/seed/dia-madres/800/600',
+      label: 'Temporada Especial',      coverImage: 'https://picsum.photos/seed/dia-madres/800/600',
       highlights: [
         'Sesión mamá + hijo/a',
         'Set temático especial',
@@ -202,12 +218,7 @@ async function main() {
     data: {
       description:
         'Ofrecemos un servicio integral que combina la precisión artística de una sesión de estudio con la cobertura documental de tu evento. El resultado es un relato visual cohesivo, elegante y profundamente emotivo.',
-      coverImage: 'https://picsum.photos/seed/exp-completa/800/600',
-      images: [
-        'https://picsum.photos/seed/exp1/800/600',
-        'https://picsum.photos/seed/exp2/800/600',
-      ],
-      highlights: [
+      coverImage: 'https://picsum.photos/seed/exp-completa/800/600',      highlights: [
         'Sesión de pre-cumpleaños personalizada',
         'Cobertura fotográfica premium del evento',
         'Álbum editorial de diseño exclusivo',

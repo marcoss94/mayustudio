@@ -12,6 +12,7 @@ interface MobileNavProps {
 const navLinks = [
   { href: '/', label: 'Inicio' },
   { href: '/servicios', label: 'Estilos' },
+  { href: '/especiales', label: 'Especiales' },
   { href: '/galeria', label: 'Galería' },
   { href: '/contacto', label: 'Contacto' },
   { href: '/login', label: 'Iniciar sesión' },
@@ -145,7 +146,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                     href={link.href}
                     onClick={onClose}
                     className={[
-                      'flex min-h-[56px] items-center px-6 py-4 font-serif text-lg',
+                      'flex min-h-[48px] items-center px-6 py-3 font-serif text-base',
                       'border-b border-outline-variant/20 transition-colors',
                       isActive
                         ? 'text-primary'
@@ -166,7 +167,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           <Link
             href="/reservar"
             onClick={onClose}
-            className="btn-primary flex min-h-[52px] w-full items-center justify-center rounded-full px-6 text-base font-medium text-on-primary"
+            className="btn-primary flex min-h-[44px] w-full items-center justify-center rounded-full px-6 text-sm font-medium text-on-primary"
           >
             Reservar sesión
           </Link>

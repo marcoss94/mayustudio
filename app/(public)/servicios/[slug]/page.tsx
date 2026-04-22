@@ -1,13 +1,20 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Clock, CheckCircle2 } from 'lucide-react';
 import { getStyleBySlug, getStyleSlugs } from '@/lib/queries/services';
+import { getGalleryImages } from '@/lib/queries/gallery';
 import { formatCurrency } from '@/lib/utils';
+import { FAQ, HowItWorks } from '@/components/sections';
+
+const DEDICATED_PAGES = ['cake-smash', 'fine-art', 'minimalista'];
 
 export async function generateStaticParams() {
   const styles = await getStyleSlugs();
-  return styles.map((s) => ({ slug: s.slug }));
+  return styles
+    .filter((s) => !DEDICATED_PAGES.includes(s.slug))
+    .map((s) => ({ slug: s.slug }));
 }
 
 export async function generateMetadata({
@@ -30,138 +37,281 @@ export default async function StyleDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const style = await getStyleBySlug(slug);
+
+  if (DEDICATED_PAGES.includes(slug)) {
+    redirect(`/servicios/${slug}`);
+  }
+
+  const [style, galleryImages] = await Promise.all([
+    getStyleBySlug(slug),
+    getGalleryImages(slug),
+  ]);
+
   if (!style) notFound();
 
-  const hasSets = style.type === 'SETS_AND_TIERS' && style.sets.length > 0;
+  const images = galleryImages.slice(0, 6);
+  const isSeasonal = style.type === 'SEASONAL';
 
   return (
-    <main className="pt-24 pb-20">
-      {/* Hero */}
-      <section className="px-4 md:px-8 max-w-screen-2xl mx-auto mb-12">
-        <div className="relative aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(63,43,34,0.06)]">
-          <Image
-            src={style.coverImage || `https://picsum.photos/seed/${style.slug}/1600/700`}
-            alt={style.name}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#3f2b22]/50 to-transparent" />
-          <div className="absolute inset-0 flex items-end px-6 md:px-16 pb-6 md:pb-12">
-            <div>
-              <h1 className="font-serif text-3xl md:text-6xl text-white mb-2">{style.name}</h1>
-              {style.badge && (
-                <span className="bg-secondary text-on-secondary px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-                  {style.badge}
-                </span>
+    <main className="pt-24">
+      {/* ─── Hero split ────────────────────────────────────────────────── */}
+      <section className="px-4 md:px-20 py-16 max-w-screen-2xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center gap-12">
+          <div className="w-full md:w-1/2 order-2 md:order-1">
+            {style.label && (
+              <span className="font-sans text-xs uppercase tracking-[0.2em] text-primary mb-4 block font-semibold">
+                {style.label}
+              </span>
+            )}
+            {style.badge && !style.label && (
+              <span className="inline-block bg-secondary text-on-secondary px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
+                {style.badge}
+              </span>
+            )}
+            <h1 className="font-serif text-4xl md:text-7xl italic leading-tight text-primary mb-6">
+              {style.name}
+            </h1>
+            <p className="text-on-surface-variant text-base md:text-xl max-w-lg mb-10 leading-relaxed">
+              {style.shortDescription || style.description}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/reservar"
+                className="bg-primary text-on-primary px-6 md:px-7 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
+              >
+                Reservar {style.name}
+              </Link>
+              {images.length > 0 && (
+                <a
+                  href="#galeria"
+                  className="bg-white text-primary border-2 border-primary-container px-6 md:px-7 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
+                >
+                  Ver galería
+                </a>
               )}
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-end">
+            <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(63,43,34,0.06)] max-w-xs md:max-w-sm">
+              <Image
+                src={style.coverImage || `https://picsum.photos/seed/${style.slug}/600/750`}
+                alt={style.name}
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Info */}
-      <section className="px-4 md:px-8 max-w-screen-xl mx-auto mb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2">
-            <p className="text-lg text-on-surface-variant leading-relaxed mb-8">
+      {/* ─── Descripción completa ──────────────────────────────────────── */}
+      {style.description && style.description !== style.shortDescription && (
+        <section className="bg-surface-container-low py-16 md:py-24 px-4 md:px-8">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-on-surface-variant text-base md:text-lg leading-relaxed">
               {style.description}
             </p>
-            {style.highlights.length > 0 && (
-              <ul className="space-y-3">
-                {style.highlights.map((h: string) => (
-                  <li key={h} className="flex items-center gap-3">
-                    <svg className="w-5 h-5 text-secondary shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                    </svg>
-                    <span>{h}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
-          <div className="bg-surface-container-low rounded-2xl p-8">
-            {style.price !== null && (
-              <div className="mb-4">
-                <p className="text-sm text-on-surface-variant uppercase tracking-wider mb-1">Precio</p>
-                <p className="font-serif text-3xl text-primary">{formatCurrency(style.price)}</p>
+        </section>
+      )}
+
+      {/* ─── Galería ───────────────────────────────────────────────────── */}
+      {images.length > 0 && (
+        <section className="py-16 md:py-24 px-4 md:px-8 max-w-5xl mx-auto" id="galeria">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="font-serif text-3xl md:text-5xl text-on-background mb-4">
+              {isSeasonal ? 'Momentos capturados' : 'Galería'}
+            </h2>
+            <p className="text-on-surface-variant max-w-xl mx-auto">
+              Una muestra de lo que creamos en cada sesión.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            {images.map((img) => (
+              <div
+                key={img.id}
+                className="rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(63,43,34,0.06)]"
+              >
+                <Image
+                  src={img.url}
+                  alt={img.alt}
+                  width={400}
+                  height={500}
+                  className="w-full aspect-[4/5] object-cover"
+                />
               </div>
-            )}
-            {style.duration && (
-              <div className="mb-6">
-                <p className="text-sm text-on-surface-variant uppercase tracking-wider mb-1">Duración</p>
-                <p className="text-lg">{style.duration} minutos</p>
-              </div>
-            )}
-            <Link
-              href="/reservar"
-              className="bg-primary text-on-primary px-8 py-3.5 rounded-full font-medium hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[48px] flex items-center justify-center active:scale-[0.98] w-full"
-            >
-              Reservar esta sesión
-            </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── La Experiencia (estilo Fine Art) ──────────────────────────── */}
+      <section className="py-20 md:py-32 px-4 md:px-8 bg-surface-container">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 md:gap-20 items-center">
+          <div className="w-full md:w-1/2">
+            <span className="font-sans text-xs uppercase tracking-[0.2em] text-secondary mb-4 block">
+              La Experiencia
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl italic mb-8">
+              {isSeasonal
+                ? 'Un momento que no se repite'
+                : 'Una sesión con intención'}
+            </h2>
+            <ul className="space-y-10 md:space-y-12">
+              {[
+                {
+                  n: '01',
+                  title: 'Dirección de Arte',
+                  desc: 'Coordinamos vestuario, accesorios y paleta de colores para que cada detalle sume al resultado final.',
+                },
+                {
+                  n: '02',
+                  title: 'Sesión Guiada',
+                  desc: 'Trabajamos con luz natural controlada y ritmo tranquilo para capturar gestos auténticos sin forzar poses.',
+                },
+                {
+                  n: '03',
+                  title: 'Edición Cuidada',
+                  desc: 'Post-producción manual fotografía por fotografía para preservar la emoción y el carácter de cada retrato.',
+                },
+              ].map((step) => (
+                <li key={step.n} className="flex gap-6">
+                  <span className="text-3xl md:text-4xl font-serif italic text-outline-variant shrink-0">
+                    {step.n}
+                  </span>
+                  <div>
+                    <h4 className="font-bold text-on-surface mb-2">
+                      {step.title}
+                    </h4>
+                    <p className="text-on-surface-variant leading-relaxed">
+                      {step.desc}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="w-full md:w-1/2 flex justify-center">
+            <div className="rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(63,43,34,0.06)] max-w-xs md:max-w-sm">
+              <Image
+                src={`https://picsum.photos/seed/${style.slug}-exp/500/625`}
+                alt={`Experiencia ${style.name}`}
+                width={500}
+                height={625}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Sets (solo para estilos con sets, ej Cake Smash) */}
-      {hasSets && (
-        <section className="px-4 md:px-8 max-w-screen-xl mx-auto mb-16">
-          <h2 className="font-serif text-2xl md:text-4xl mb-8">Sets disponibles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {style.sets.map((set) => (
-              <div key={set.slug} className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(63,43,34,0.06)]">
-                <div className="aspect-[4/3] relative">
-                  <Image
-                    src={set.coverImage || `https://picsum.photos/seed/set-${set.slug}/600/450`}
-                    alt={set.name}
-                    fill
-                    className="object-cover"
-                  />
-                  {set.isCustom && (
-                    <span className="absolute top-3 right-3 bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-semibold">
-                      Personalizado
-                    </span>
-                  )}
-                </div>
-                <div className="p-6">
-                  <h3 className="font-serif text-xl mb-2">{set.name}</h3>
-                  <p className="text-on-surface-variant text-sm mb-4 leading-relaxed">{set.description}</p>
-                  {set.isCustom ? (
-                    <p className="font-serif text-2xl text-primary">{formatCurrency(set.customPrice!)}</p>
-                  ) : (
-                    <div className="flex gap-4">
-                      <div>
-                        <p className="text-xs text-on-surface-variant uppercase tracking-wider">Standard</p>
-                        <p className="font-serif text-lg text-primary">{formatCurrency(set.standardPrice)}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-on-surface-variant uppercase tracking-wider">Premium</p>
-                        <p className="font-serif text-lg text-primary">{formatCurrency(set.premiumPrice)}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* ─── Paquete (estilo Fine Art) ─────────────────────────────────── */}
+      <section className="py-20 md:py-32 px-4 md:px-8 bg-surface">
+        <div className="max-w-3xl mx-auto border border-outline-variant/20 rounded-3xl p-8 md:p-20 text-center bg-surface-container-lowest shadow-sm">
+          <span className="font-sans text-secondary uppercase tracking-widest text-xs mb-6 block">
+            {isSeasonal ? 'Edición Limitada' : 'La Experiencia'}
+          </span>
+          <h2 className="font-serif text-4xl md:text-5xl text-primary mb-12">
+            {style.name} Collection
+          </h2>
 
-      {/* Extras (ej: Minimalista) */}
-      {style.extras.length > 0 && (
-        <section className="px-4 md:px-8 max-w-screen-xl mx-auto mb-16">
-          <h2 className="font-serif text-2xl md:text-4xl mb-8">Opcionales</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {style.extras.map((extra) => (
-              <div key={extra.id} className="bg-surface-container-low rounded-xl p-6 flex justify-between items-center">
-                <span>{extra.name}</span>
-                <span className="font-serif text-primary font-semibold">{formatCurrency(extra.price)}</span>
+          <div className="space-y-6 mb-12 text-left max-w-md mx-auto">
+            {style.duration && (
+              <div className="flex items-start gap-4">
+                <Clock className="w-6 h-6 text-primary shrink-0 mt-1" strokeWidth={1.5} aria-hidden="true" />
+                <p className="text-on-surface-variant">
+                  <strong className="text-on-surface">Duración:</strong>{' '}
+                  {style.duration} minutos de sesión.
+                </p>
+              </div>
+            )}
+            {style.highlights.map((h: string) => (
+              <div key={h} className="flex items-start gap-4">
+                <CheckCircle2 className="w-6 h-6 text-primary shrink-0 mt-1" strokeWidth={1.5} aria-hidden="true" />
+                <p className="text-on-surface-variant">{h}</p>
               </div>
             ))}
           </div>
-        </section>
-      )}
+
+          {style.price !== null && style.price !== undefined && (
+            <div className="mb-12">
+              <p className="font-serif italic text-4xl md:text-5xl text-primary">
+                {formatCurrency(style.price)}
+              </p>
+              <p className="text-sm text-on-surface-variant/70 mt-2 font-sans uppercase tracking-widest">
+                {isSeasonal ? 'Inversión de Temporada' : 'Inversión en Memoria'}
+              </p>
+            </div>
+          )}
+
+          <Link
+            href="/reservar"
+            className="w-full md:w-auto inline-flex px-8 md:px-10 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-sans uppercase text-sm tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/10 min-h-[44px] items-center justify-center active:scale-[0.98]"
+          >
+            {isSeasonal ? 'Solicitar Disponibilidad' : `Reservar ${style.name}`}
+          </Link>
+
+          {isSeasonal && style.seasonEnd && (
+            <p className="mt-6 text-xs text-on-surface-variant/60 italic">
+              Disponible hasta{' '}
+              {new Date(style.seasonEnd).toLocaleDateString('es-AR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* ─── Cómo funciona ─────────────────────────────────────────────── */}
+      <HowItWorks
+        title="¿Cómo funciona?"
+        steps={[
+          { n: '1', title: 'Reservá', desc: 'Elegí tu fecha y confirmá con la seña online.' },
+          { n: '2', title: 'Coordinamos', desc: 'Definimos detalles, vestuario y paleta de colores.' },
+          { n: '3', title: 'Sesión', desc: 'Una experiencia tranquila y artística en el estudio.' },
+          { n: '4', title: 'Entrega', desc: 'Recibís tu galería editada en formato digital.' },
+        ]}
+      />
+
+      {/* ─── FAQ ───────────────────────────────────────────────────────── */}
+      <FAQ
+        items={[
+          { q: '¿Con cuánta antelación debo reservar?', a: 'Recomendamos reservar con al menos 4 a 6 semanas de antelación, especialmente para sesiones de temporada.' },
+          { q: '¿Qué debo llevar?', a: 'Nosotros proporcionamos vestuario y accesorios. Si preferís usar prendas propias, te asesoramos para que armonicen con la estética.' },
+          { q: '¿Cómo recibiré las fotografías?', a: 'Recibirás una galería online privada con las fotos editadas, entre 10 y 15 días hábiles después de la sesión.' },
+        ]}
+      />
+
+      {/* ─── CTA final ─────────────────────────────────────────────────── */}
+      <section className="py-24 md:py-32 px-4 md:px-8 text-center bg-primary text-on-primary">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-serif text-3xl md:text-5xl italic mb-8 leading-tight">
+            {isSeasonal ? 'No dejes pasar esta temporada' : 'Capturemos tu historia'}
+          </h2>
+          <p className="text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto font-light">
+            {isSeasonal
+              ? 'Las sesiones estacionales son únicas y los cupos son limitados. Reservá el tuyo hoy.'
+              : 'Cada sesión es un momento único. Reservá la tuya y creemos algo memorable juntos.'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <Link
+              href="/reservar"
+              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
+            >
+              Reservar ahora
+            </Link>
+            <Link
+              href="/contacto"
+              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
+            >
+              Enviar consulta
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
