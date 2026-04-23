@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
+import { UserMenu } from './UserMenu';
 import { MobileNav } from './MobileNav';
 
 const navLinks = [
@@ -17,6 +20,8 @@ const navLinks = [
 export function Header() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === 'authenticated' && !!session;
 
   return (
     <>
@@ -53,19 +58,21 @@ export function Header() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 md:gap-6">
-            <Link
-              href="/login"
-              className="hidden lg:block text-primary font-medium hover:opacity-80 transition-all duration-300"
-            >
-              Iniciar sesión
-            </Link>
-            <Link
-              href="/reservar"
-              className="hidden md:flex bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] active:scale-95 items-center"
-            >
-              Reservar sesión
-            </Link>
+          <div className="flex items-center gap-3 md:gap-4">
+            <Button asChild variant="primary" size="sm" className="hidden md:inline-flex">
+              <Link href="/reservar">Reservar sesión</Link>
+            </Button>
+
+            {isLoggedIn && session ? (
+              <UserMenu session={session} />
+            ) : (
+              <Link
+                href="/login"
+                className="hidden lg:block text-primary font-medium text-sm hover:opacity-80 transition-all duration-300"
+              >
+                Iniciar sesión
+              </Link>
+            )}
 
             {/* Hamburger mobile */}
             <button

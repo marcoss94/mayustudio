@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Paintbrush, Aperture, Palette, CalendarHeart } from 'lucide-react';
 import { HowItWorks, FAQ, SpecialsBanner } from '@/components/sections';
+import { Button } from '@/components/ui/Button';
 import { getActiveStyles, getSeasonalStyles } from '@/lib/queries/services';
 import { getGalleryImages } from '@/lib/queries/gallery';
 import { websiteJsonLd, localBusinessJsonLd } from '@/lib/seo/json-ld';
@@ -58,9 +59,13 @@ export default async function HomePage() {
               priority
             />
           </div>
+          <p className="mb-4 inline-flex items-center gap-2 font-sans text-[0.7rem] uppercase tracking-[0.25em] text-accent font-medium">
+            <span aria-hidden="true" className="h-px w-8 bg-accent" />
+            Estudio en Montevideo
+          </p>
           <h1 className="font-serif text-3xl text-on-surface leading-[1.15] mb-4 tracking-tight">
             Capturando la{' '}
-            <span className="italic text-primary">esencia</span> de la infancia
+            <span className="italic text-accent">esencia</span> de la infancia
           </h1>
           <p className="text-base text-on-surface-variant leading-relaxed mb-8">
             Creamos recuerdos atemporales a través de una mirada editorial y
@@ -68,18 +73,12 @@ export default async function HomePage() {
             generaciones.
           </p>
           <div className="flex flex-col gap-3">
-            <Link
-              href="/servicios"
-              className="bg-primary text-on-primary px-6 py-2.5 rounded-full font-medium text-sm hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-            >
-              Ver estilos
-            </Link>
-            <Link
-              href="/reservar"
-              className="bg-white text-primary border-2 border-primary-container px-6 py-2.5 rounded-full font-medium text-sm hover:bg-surface transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-            >
-              Reservar sesión
-            </Link>
+            <Button asChild variant="primary" className="w-full">
+              <Link href="/servicios">Ver estilos</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/reservar">Reservar sesión</Link>
+            </Button>
           </div>
         </div>
 
@@ -95,9 +94,13 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-surface/90 via-surface/40 to-transparent" />
           <div className="absolute inset-0 flex items-center px-24">
             <div className="max-w-xl">
+              <p className="mb-5 inline-flex items-center gap-3 font-sans text-xs uppercase tracking-[0.25em] text-accent font-medium">
+                <span aria-hidden="true" className="h-px w-10 bg-accent" />
+                Estudio en Montevideo
+              </p>
               <h1 className="font-serif text-6xl lg:text-7xl text-on-surface leading-[1.1] mb-6 tracking-tight">
                 Capturando la{' '}
-                <span className="italic text-primary">esencia</span> de la
+                <span className="italic text-accent">esencia</span> de la
                 infancia
               </h1>
               <p className="text-lg text-on-surface-variant leading-relaxed mb-10">
@@ -106,18 +109,12 @@ export default async function HomePage() {
                 generaciones.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link
-                  href="/servicios"
-                  className="bg-primary text-on-primary px-8 py-3 rounded-full font-medium hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center"
-                >
-                  Ver estilos
-                </Link>
-                <Link
-                  href="/reservar"
-                  className="bg-white text-primary border-2 border-primary-container px-8 py-3 rounded-full font-medium hover:bg-surface transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center"
-                >
-                  Reservar sesión
-                </Link>
+                <Button asChild variant="primary">
+                  <Link href="/servicios">Ver estilos</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/reservar">Reservar sesión</Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -149,7 +146,7 @@ export default async function HomePage() {
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-screen-2xl mx-auto">
         <div className="mb-12 md:mb-16">
           <h2 className="font-serif text-3xl md:text-5xl mb-4">Nuestros Estilos</h2>
-          <div className="h-1 w-20 bg-secondary rounded-full" />
+          <div className="h-1 w-20 bg-accent rounded-full" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
           {featuredStyles.map((service) => (
@@ -170,12 +167,14 @@ export default async function HomePage() {
               <p className="text-on-surface-variant mb-6 leading-relaxed">
                 {service.shortDescription || service.name}
               </p>
-              <span className="bg-primary text-on-primary px-8 py-3 rounded-full font-medium hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] inline-flex items-center gap-2">
-                Ver detalles
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </span>
+              <Button asChild variant="primary">
+                <span>
+                  Ver detalles
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </span>
+              </Button>
             </Link>
           ))}
         </div>
@@ -228,12 +227,9 @@ export default async function HomePage() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/experiencia-completa"
-              className="bg-primary text-on-primary px-8 py-3 rounded-full font-medium hover:opacity-90 transition-all shadow-[0_20px_40px_rgba(63,43,34,0.06)] inline-flex items-center min-h-[44px]"
-            >
-              Conocer la experiencia
-            </Link>
+            <Button asChild variant="primary">
+              <Link href="/experiencia-completa">Conocer la experiencia</Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -303,18 +299,12 @@ export default async function HomePage() {
             en tus tesoros más preciados.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link
-              href="/reservar"
-              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Reservar sesión ahora
-            </Link>
-            <Link
-              href="/contacto"
-              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Enviar consulta directa
-            </Link>
+            <Button asChild variant="inverse">
+              <Link href="/reservar">Reservar sesión ahora</Link>
+            </Button>
+            <Button asChild variant="inverse-outline">
+              <Link href="/contacto">Enviar consulta directa</Link>
+            </Button>
           </div>
         </div>
       </section>

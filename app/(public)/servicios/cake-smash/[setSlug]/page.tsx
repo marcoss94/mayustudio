@@ -7,6 +7,7 @@ import { getStyleBySlug } from '@/lib/queries/services';
 import { formatCurrency } from '@/lib/utils';
 import { FAQ, HowItWorks } from '@/components/sections';
 import { CustomSetForm } from './CustomSetForm';
+import { Button } from '@/components/ui/Button';
 
 export async function generateStaticParams() {
   const style = await getStyleBySlug('cake-smash');
@@ -101,12 +102,9 @@ export default async function SetDetailPage({
                   {set.description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <a
-                    href="#formulario"
-                    className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-xl shadow-primary/10 min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-                  >
-                    Contar mi idea
-                  </a>
+                  <Button asChild variant="primary">
+                    <a href="#formulario">Contar mi idea</a>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -207,19 +205,13 @@ export default async function SetDetailPage({
               {set.description}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="#paquetes"
-                className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-xl shadow-primary/10 min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                Explorar sesión
-              </a>
+              <Button asChild variant="primary">
+                <a href="#paquetes">Ver paquetes</a>
+              </Button>
               {images.length > 0 && (
-                <a
-                  href="#galeria"
-                  className="bg-surface text-primary border border-outline-variant/20 px-6 md:px-8 py-2.5 md:py-3 rounded-full font-medium hover:bg-surface-container-low transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-                >
-                  Ver galería
-                </a>
+                <Button asChild variant="outline">
+                  <a href="#galeria">Ver galería</a>
+                </Button>
               )}
             </div>
           </div>
@@ -312,12 +304,11 @@ export default async function SetDetailPage({
                   {formatCurrency(set.standardPrice)}
                 </p>
               </div>
-              <Link
-                href={`/reservar?servicio=cake-smash&set=${set.slug}&tier=standard`}
-                className="w-full md:w-auto mx-auto inline-flex px-8 md:px-10 py-3 border border-outline text-primary rounded-full font-sans uppercase text-sm tracking-widest hover:bg-surface-container transition-colors min-h-[44px] items-center justify-center active:scale-[0.98]"
-              >
-                Reservar Standard
-              </Link>
+              <Button asChild variant="outline" uppercase fullWidthMobile className="mx-auto">
+                <Link href={`/reservar?servicio=cake-smash&set=${set.slug}&tier=standard`}>
+                  Reservar Standard
+                </Link>
+              </Button>
             </div>
 
             {/* Premium */}
@@ -352,12 +343,11 @@ export default async function SetDetailPage({
                   {formatCurrency(set.premiumPrice)}
                 </p>
               </div>
-              <Link
-                href={`/reservar?servicio=cake-smash&set=${set.slug}&tier=premium`}
-                className="w-full md:w-auto mx-auto inline-flex px-8 md:px-10 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-sans uppercase text-sm tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/10 min-h-[44px] items-center justify-center active:scale-[0.98]"
-              >
-                Reservar Premium
-              </Link>
+              <Button asChild variant="primary" uppercase fullWidthMobile className="mx-auto">
+                <Link href={`/reservar?servicio=cake-smash&set=${set.slug}&tier=premium`}>
+                  Reservar Premium
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -456,12 +446,11 @@ export default async function SetDetailPage({
                   </span>
                 </div>
               </div>
-              <Link
-                href={`/servicios/cake-smash/${customSet.slug}`}
-                className="inline-flex bg-primary text-on-primary px-6 md:px-7 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] items-center active:scale-[0.98]"
-              >
-                Crear mi set personalizado
-              </Link>
+              <Button asChild variant="primary">
+                <Link href={`/servicios/cake-smash/${customSet.slug}`}>
+                  Crear mi set personalizado
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -487,18 +476,14 @@ export default async function SetDetailPage({
             Los cupos son limitados. Asegurá tu fecha antes de que se agote.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link
-              href={`/reservar?servicio=cake-smash&set=${set.slug}`}
-              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Reservar ahora
-            </Link>
-            <Link
-              href="/contacto"
-              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Enviar consulta
-            </Link>
+            <Button asChild variant="inverse">
+              <Link href={`/reservar?servicio=cake-smash&set=${set.slug}`}>
+                Reservar ahora
+              </Link>
+            </Button>
+            <Button asChild variant="inverse-outline">
+              <Link href="/contacto">Enviar consulta</Link>
+            </Button>
           </div>
         </div>
       </section>

@@ -6,6 +6,7 @@ import { getGalleryImages } from '@/lib/queries/gallery';
 import { formatCurrency } from '@/lib/utils';
 import { HowItWorks, FAQ } from '@/components/sections';
 import { Sun, Palette, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
   title: 'Estilo Minimalista',
@@ -40,18 +41,12 @@ export default async function MinimalistaPage() {
               conexión pura con la cámara.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/reservar"
-                className="bg-primary text-on-primary px-6 md:px-7 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                Reservar Minimalista
-              </Link>
-              <a
-                href="#galeria"
-                className="bg-white text-primary border-2 border-primary-container px-6 md:px-7 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                Ver galería
-              </a>
+              <Button asChild variant="primary">
+                <Link href="/reservar">Reservar Minimalista</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <a href="#galeria">Ver galería</a>
+              </Button>
             </div>
           </div>
           <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-end">
@@ -206,12 +201,9 @@ export default async function MinimalistaPage() {
               </p>
             </div>
           )}
-          <Link
-            href="/reservar"
-            className="w-full md:w-auto inline-flex px-8 md:px-10 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-sans uppercase text-sm tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/10 min-h-[44px] items-center justify-center active:scale-[0.98]"
-          >
-            Reservar Minimalista
-          </Link>
+          <Button asChild variant="gradient" uppercase fullWidthMobile>
+            <Link href="/reservar">Reservar Minimalista</Link>
+          </Button>
         </div>
       </section>
 
@@ -275,18 +267,12 @@ export default async function MinimalistaPage() {
             Reservá tu sesión minimalista y descubrí la belleza de lo esencial.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link
-              href="/reservar"
-              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Reservar Minimalista
-            </Link>
-            <Link
-              href="/contacto"
-              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Enviar consulta
-            </Link>
+            <Button asChild variant="inverse">
+              <Link href="/reservar">Reservar Minimalista</Link>
+            </Button>
+            <Button asChild variant="inverse-outline">
+              <Link href="/contacto">Enviar consulta</Link>
+            </Button>
           </div>
         </div>
       </section>

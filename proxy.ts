@@ -46,8 +46,7 @@ export default auth((req) => {
   }
 
   // ─── Rutas de admin — requiere ADMIN o SUPERADMIN ──────────────────────
-  const isAdminRoute =
-    pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
+  const isAdminRoute = pathname.startsWith('/admin');
 
   if (isAdminRoute) {
     if (!isLoggedIn) {

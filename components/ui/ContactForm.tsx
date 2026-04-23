@@ -15,6 +15,7 @@ import { useActionState, useState, useCallback } from 'react';
 import { contactSchema } from '@/lib/validations/contact';
 import { contactAction } from '@/actions/contact.actions';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import type { ActionResult } from '@/types';
 
 export interface ContactFormService {
@@ -336,49 +337,15 @@ export function ContactForm({ services }: ContactFormProps) {
 
       {/* Submit */}
       <div className="pt-2">
-        <button
+        <Button
           type="submit"
+          variant="primary"
+          isLoading={isPending}
           disabled={isPending}
-          aria-busy={isPending}
-          className={cn(
-            'btn-primary w-full px-6 py-2.5',
-            'font-sans text-base font-medium',
-            'min-h-[44px]',
-            'flex items-center justify-center gap-2',
-            'transition-all duration-200',
-            'active:scale-[0.98]',
-            isPending && 'cursor-not-allowed opacity-70',
-          )}
+          className="w-full"
         >
-          {isPending ? (
-            <>
-              <svg
-                className="h-5 w-5 animate-spin"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
-              Enviando...
-            </>
-          ) : (
-            'Enviar mensaje'
-          )}
-        </button>
+          {isPending ? 'Enviando...' : 'Enviar mensaje'}
+        </Button>
         <p className="mt-3 text-center font-sans text-xs text-[color:var(--color-on-surface-variant)]/70">
           Te responderemos en 24 a 48 horas
         </p>

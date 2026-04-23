@@ -6,6 +6,7 @@ import { getGalleryImages } from '@/lib/queries/gallery';
 import { formatCurrency } from '@/lib/utils';
 import { Cake, Palette } from 'lucide-react';
 import { HowItWorks, FAQ } from '@/components/sections';
+import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
   title: 'Cake Smash',
@@ -87,12 +88,11 @@ export default async function CakeSmashPage() {
               <p className="font-serif text-2xl md:text-3xl mb-10">
                 {formatCurrency(customSet.customPrice!)}
               </p>
-              <Link
-                href="/servicios/cake-smash/personalizado"
-                className="bg-on-primary text-primary px-6 md:px-7 py-2.5 md:py-3 rounded-full font-bold hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
-              >
-                Solicitar set personalizado
-              </Link>
+              <Button asChild variant="inverse">
+                <Link href="/servicios/cake-smash/personalizado">
+                  Solicitar set personalizado
+                </Link>
+              </Button>
             </div>
             <div className="w-full md:w-1/2 aspect-video md:aspect-auto min-h-[300px] relative">
               <Image
@@ -222,18 +222,12 @@ export default async function CakeSmashPage() {
             cada diseño.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link
-              href="/reservar"
-              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Reservar Cake Smash
-            </Link>
-            <Link
-              href="/contacto"
-              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Enviar consulta directa
-            </Link>
+            <Button asChild variant="inverse">
+              <Link href="/reservar">Reservar Cake Smash</Link>
+            </Button>
+            <Button asChild variant="inverse-outline">
+              <Link href="/contacto">Enviar consulta directa</Link>
+            </Button>
           </div>
         </div>
       </section>

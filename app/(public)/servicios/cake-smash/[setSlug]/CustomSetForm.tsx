@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
 
 export interface CustomSetFormProps {
   setSlug: string;
@@ -102,12 +103,9 @@ export function CustomSetForm({ setSlug }: CustomSetFormProps) {
         </p>
       </div>
 
-      <button
-        type="submit"
-        className="w-full md:w-auto inline-flex px-8 md:px-10 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-sans uppercase text-sm tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/10 min-h-[44px] items-center justify-center active:scale-[0.98]"
-      >
+      <Button type="submit" variant="gradient" uppercase fullWidthMobile>
         Continuar con la reserva
-      </button>
+      </Button>
     </form>
   );
 }

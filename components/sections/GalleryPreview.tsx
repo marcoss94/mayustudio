@@ -11,6 +11,7 @@
 import Link from 'next/link';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { GalleryItem } from '@/components/ui/GalleryItem';
+import { Button } from '@/components/ui/Button';
 import { getGalleryImages } from '@/lib/queries/gallery';
 
 const GALLERY_SIZES =
@@ -55,12 +56,9 @@ export async function GalleryPreview() {
         )}
 
         <div className="mt-10 text-center">
-          <Link
-            href="/galeria"
-            className="btn-primary inline-flex min-h-[44px] items-center justify-center px-8 py-3 text-base font-medium text-on-primary"
-          >
-            Ver galería completa
-          </Link>
+          <Button asChild variant="primary">
+            <Link href="/galeria">Ver galería completa</Link>
+          </Button>
         </div>
       </div>
     </section>

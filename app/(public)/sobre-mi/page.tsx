@@ -11,6 +11,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 /* ─── Metadata ─────────────────────────────────────────────────────────────── */
 
@@ -286,18 +287,12 @@ export default function SobreMiPage() {
 
           {/* CTAs: columna mobile, fila sm+ */}
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link
-              href="/contacto"
-              className="btn-primary inline-flex min-h-[44px] w-full items-center justify-center px-6 py-2.5 font-sans text-sm font-semibold text-on-primary active:scale-[0.98] sm:w-auto"
-            >
-              Contactarme
-            </Link>
-            <Link
-              href="/servicios"
-              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border-2 border-primary/30 px-6 py-2.5 font-sans text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/60 hover:bg-primary/5 active:scale-[0.98] sm:w-auto"
-            >
-              Ver sesiones
-            </Link>
+            <Button asChild variant="primary" fullWidthMobile>
+              <Link href="/contacto">Contactarme</Link>
+            </Button>
+            <Button asChild variant="outline" fullWidthMobile>
+              <Link href="/servicios">Ver sesiones</Link>
+            </Button>
           </div>
         </div>
       </section>

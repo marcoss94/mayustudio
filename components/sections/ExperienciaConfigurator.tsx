@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Check, Clock, Sparkles, Camera } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 
 export interface ConfigStyle {
   id: string;
@@ -340,14 +341,15 @@ export function ExperienciaConfigurator({
             </p>
           </div>
 
-          <Link
-            href={`/reservar?servicio=experiencia-completa${
-              selectedStyle ? `&estilo=${selectedStyle}` : ''
-            }${selectedSet ? `&set=${selectedSet}` : ''}&cobertura=${coverage}`}
-            className="w-full md:w-auto inline-flex px-8 md:px-10 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-sans uppercase text-sm tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/10 min-h-[44px] items-center justify-center active:scale-[0.98]"
-          >
-            Reservar sesión ahora
-          </Link>
+          <Button asChild variant="gradient" uppercase fullWidthMobile>
+            <Link
+              href={`/reservar?servicio=experiencia-completa${
+                selectedStyle ? `&estilo=${selectedStyle}` : ''
+              }${selectedSet ? `&set=${selectedSet}` : ''}&cobertura=${coverage}`}
+            >
+              Reservar sesión ahora
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

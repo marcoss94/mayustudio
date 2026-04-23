@@ -24,6 +24,12 @@
   --color-tertiary-light: #7a9e64;
   --color-on-tertiary: #ffffff;
 
+  /* ─── Colors: Accent (Terracotta) — chispa cálida, juguetona ────────────── */
+  --color-accent: oklch(0.58 0.13 32);
+  --color-accent-container: oklch(0.88 0.06 32);
+  --color-accent-soft: oklch(0.95 0.025 32);
+  --color-on-accent: #ffffff;
+
   /* ─── Colors: Surface (Warm Cream) ─────────────────────────────────────── */
   --color-surface: #fcfaed;
   --color-surface-dim: #f5f0dc;
@@ -61,8 +67,8 @@
   --color-glass-border: rgba(211, 196, 186, 0.2);
 
   /* ─── Typography: Font Families ─────────────────────────────────────────── */
-  --font-serif: var(--font-noto-serif), 'Georgia', 'Times New Roman', serif;
-  --font-sans: var(--font-inter), 'system-ui', '-apple-system', sans-serif;
+  --font-serif: var(--font-display), 'Georgia', 'Times New Roman', serif;
+  --font-sans: var(--font-body), 'system-ui', '-apple-system', sans-serif;
 
   /* ─── Typography: Font Sizes ────────────────────────────────────────────── */
   --text-display-lg: 3.5rem;

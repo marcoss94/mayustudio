@@ -1,24 +1,24 @@
 import type { Metadata } from 'next';
-import { Noto_Serif, Inter } from 'next/font/google';
+import { Young_Serif, Onest } from 'next/font/google';
 import './globals.css';
 import { SessionProvider } from '@/components/providers/session-provider';
 import { websiteJsonLd } from '@/lib/seo/json-ld';
 
 /* ─── Fonts ─────────────────────────────────────────────────────────────────
-   Noto Serif — titulares y display (voz editorial de MayuStudio)
-   Inter       — body, labels, UI (legibilidad funcional)
+   Young Serif — display cálido con carácter (titulares, hero)
+   Onest       — body humanista variable (UI, párrafos)
 ─────────────────────────────────────────────────────────────────────────── */
 
-const notoSerif = Noto_Serif({
+const youngSerif = Young_Serif({
   subsets: ['latin'],
-  variable: '--font-noto-serif',
+  variable: '--font-display',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: ['400'],
 });
 
-const inter = Inter({
+const onest = Onest({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-body',
   display: 'swap',
 });
 
@@ -61,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${notoSerif.variable} ${inter.variable}`}
+      className={`${youngSerif.variable} ${onest.variable}`}
     >
       <body>
         {/* JSON-LD: WebSite — presente en todas las páginas */}

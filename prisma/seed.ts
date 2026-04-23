@@ -1,5 +1,6 @@
 import path from 'node:path';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
@@ -253,6 +254,35 @@ async function main() {
       { url: 'https://picsum.photos/seed/g18/800/600', alt: 'Día de las madres especial', styleSlug: 'dia-de-las-madres', order: 18 },
     ],
   });
+
+  // ─── Super-admin ────────────────────────────────────────────────────
+
+  const superAdminEmail = process.env.SUPERADMIN_EMAIL;
+  const superAdminPassword = process.env.SUPERADMIN_PASSWORD;
+  const superAdminName = process.env.SUPERADMIN_NAME ?? 'Super Admin';
+
+  if (superAdminEmail && superAdminPassword) {
+    const hash = await bcrypt.hash(superAdminPassword, 10);
+    await prisma.user.upsert({
+      where: { email: superAdminEmail.toLowerCase() },
+      update: {
+        password: hash,
+        role: 'SUPERADMIN',
+        name: superAdminName,
+      },
+      create: {
+        email: superAdminEmail.toLowerCase(),
+        password: hash,
+        role: 'SUPERADMIN',
+        name: superAdminName,
+      },
+    });
+    console.log(`Super-admin upserted: ${superAdminEmail}`);
+  } else {
+    console.warn(
+      'SUPERADMIN_EMAIL / SUPERADMIN_PASSWORD no definidos — super-admin omitido',
+    );
+  }
 
   console.log(
     `Seed completado: 4 estilos (3 base + 1 estacional), 4 sets Cake Smash, 3 extras Minimalista, 1 config Experiencia Completa, 18 imágenes`,

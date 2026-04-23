@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -164,13 +165,11 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
         {/* CTA Reservar — pegado al fondo */}
         <div className="px-6 pb-10 pt-6">
-          <Link
-            href="/reservar"
-            onClick={onClose}
-            className="btn-primary flex min-h-[44px] w-full items-center justify-center rounded-full px-6 text-sm font-medium text-on-primary"
-          >
-            Reservar sesión
-          </Link>
+          <Button asChild variant="primary" className="w-full">
+            <Link href="/reservar" onClick={onClose}>
+              Reservar sesión
+            </Link>
+          </Button>
         </div>
       </div>
     </>

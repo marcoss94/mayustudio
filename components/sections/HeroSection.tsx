@@ -10,6 +10,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 const DEFAULT_BG = 'https://picsum.photos/seed/mayustudio-hero/1600/900';
 
@@ -21,6 +22,7 @@ export interface HeroCTA {
 export interface HeroSectionProps {
   title: string;
   subtitle: string;
+  eyebrow?: string;
   ctaPrimary: HeroCTA;
   ctaSecondary?: HeroCTA;
   backgroundImage?: string;
@@ -29,6 +31,7 @@ export interface HeroSectionProps {
 export function HeroSection({
   title,
   subtitle,
+  eyebrow,
   ctaPrimary,
   ctaSecondary,
   backgroundImage,
@@ -59,7 +62,16 @@ export function HeroSection({
       {/* Contenido */}
       <div className="relative w-full px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pb-24">
         <div className="mx-auto max-w-3xl">
-          <h1 className="font-serif text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+          {eyebrow && (
+            <p className="mb-4 inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.2em] text-accent">
+              <span
+                aria-hidden="true"
+                className="h-px w-8 bg-accent"
+              />
+              {eyebrow}
+            </p>
+          )}
+          <h1 className="font-serif text-4xl leading-[1.05] text-white sm:text-5xl lg:text-7xl">
             {title}
           </h1>
 
@@ -69,20 +81,14 @@ export function HeroSection({
 
           {/* CTAs: columna en mobile, fila en sm+ */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-10">
-            <Link
-              href={ctaPrimary.href}
-              className="btn-primary inline-flex min-h-[44px] items-center justify-center px-8 py-3 text-base font-medium text-on-primary"
-            >
-              {ctaPrimary.label}
-            </Link>
+            <Button asChild variant="primary">
+              <Link href={ctaPrimary.href}>{ctaPrimary.label}</Link>
+            </Button>
 
             {ctaSecondary && (
-              <Link
-                href={ctaSecondary.href}
-                className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/40 bg-white/10 px-8 py-3 text-base font-medium text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
-              >
-                {ctaSecondary.label}
-              </Link>
+              <Button asChild variant="inverse-outline">
+                <Link href={ctaSecondary.href}>{ctaSecondary.label}</Link>
+              </Button>
             )}
           </div>
         </div>

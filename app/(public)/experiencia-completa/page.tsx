@@ -5,6 +5,7 @@ import { getActiveStyles, getStyleBySlug, getExperienciaCompletaConfig } from '@
 import { getGalleryImages } from '@/lib/queries/gallery';
 import { FAQ, ExperienciaConfigurator, HowItWorks } from '@/components/sections';
 import { Camera, Film } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
   title: 'Experiencia Completa',
@@ -58,18 +59,12 @@ export default async function ExperienciaCompletaPage() {
               recordado.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="#configurator"
-                className="bg-primary text-on-primary px-6 md:px-7 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                Configurar mi sesión
-              </a>
-              <a
-                href="#galeria"
-                className="bg-white text-primary border-2 border-primary-container px-6 md:px-7 py-2.5 md:py-3 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.06)] min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                Ver galería
-              </a>
+              <Button asChild variant="primary">
+                <a href="#configurator">Configurar mi sesión</a>
+              </Button>
+              <Button asChild variant="outline">
+                <a href="#galeria">Ver galería</a>
+              </Button>
             </div>
           </div>
           <div className="relative order-1 lg:order-2 flex justify-center">
@@ -222,18 +217,12 @@ export default async function ExperienciaCompletaPage() {
             familia merece.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-2">
-            <a
-              href="#configurator"
-              className="bg-on-primary text-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 shadow-[0_20px_40px_rgba(63,43,34,0.12)] min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Reservar ahora
-            </a>
-            <Link
-              href="/contacto"
-              className="bg-transparent border-2 border-on-primary px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold text-base hover:opacity-90 transition-all duration-300 min-h-[44px] flex items-center active:scale-[0.98]"
-            >
-              Enviar consulta
-            </Link>
+            <Button asChild variant="inverse">
+              <a href="#configurator">Reservar ahora</a>
+            </Button>
+            <Button asChild variant="inverse-outline">
+              <Link href="/contacto">Enviar consulta</Link>
+            </Button>
           </div>
         </div>
       </section>

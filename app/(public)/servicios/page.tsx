@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveStyles } from '@/lib/queries/services';
+import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
   title: 'Estilos',
@@ -121,12 +122,11 @@ export default async function EstilosPage() {
                     ))}
                   </ul>
                 )}
-                <Link
-                  href={`/servicios/${style.slug}`}
-                  className="bg-primary text-on-primary inline-flex min-h-[44px] items-center rounded-full px-6 py-2.5 font-sans text-sm font-semibold tracking-widest uppercase shadow-[0_20px_40px_rgba(63,43,34,0.06)] transition-all hover:opacity-90 active:scale-[0.98] md:px-8 md:py-3"
-                >
-                  Ver detalles de {style.name}
-                </Link>
+                <Button asChild variant="primary" uppercase>
+                  <Link href={`/servicios/${style.slug}`}>
+                    Ver detalles de {style.name}
+                  </Link>
+                </Button>
               </div>
             </div>
           </section>
@@ -144,18 +144,12 @@ export default async function EstilosPage() {
             tu familia y comencemos a planificar tu sesión.
           </p>
           <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
-            <Link
-              href="/reservar"
-              className="bg-on-primary text-primary flex min-h-[44px] items-center rounded-full px-6 py-2.5 text-base font-semibold shadow-[0_20px_40px_rgba(63,43,34,0.12)] transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-8 md:py-3"
-            >
-              Reservar sesión ahora
-            </Link>
-            <Link
-              href="/contacto"
-              className="border-on-primary flex min-h-[44px] items-center rounded-full border-2 bg-transparent px-6 py-2.5 text-base font-semibold transition-all duration-300 hover:opacity-90 active:scale-[0.98] md:px-8 md:py-3"
-            >
-              Enviar consulta directa
-            </Link>
+            <Button asChild variant="inverse">
+              <Link href="/reservar">Reservar sesión ahora</Link>
+            </Button>
+            <Button asChild variant="inverse-outline">
+              <Link href="/contacto">Enviar consulta directa</Link>
+            </Button>
           </div>
         </div>
       </section>
