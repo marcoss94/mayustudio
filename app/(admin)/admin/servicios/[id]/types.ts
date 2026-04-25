@@ -6,7 +6,6 @@ export interface SerializedSet {
   slug: string;
   description: string | null;
   coverImage: string | null;
-  images: string[];
   standardPrice: number;
   premiumPrice: number;
   customPrice: number | null;

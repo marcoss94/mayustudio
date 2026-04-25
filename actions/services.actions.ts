@@ -92,7 +92,7 @@ export async function updateStyle(
   try {
     const existing = await prisma.style.findUnique({
       where: { id },
-      include: { _count: { select: { sets: true } } },
+      select: { type: true, slug: true, _count: { select: { sets: true } } },
     });
     if (!existing) return { success: false, error: 'Estilo no encontrado' };
 
@@ -108,12 +108,24 @@ export async function updateStyle(
       };
     }
 
-    const style = await prisma.style.update({
-      where: { id },
-      data: emptyToUndefined(parsed.data),
-    });
+    const slugChanged = existing.slug !== parsed.data.slug;
+
+    const [style] = await prisma.$transaction([
+      prisma.style.update({
+        where: { id },
+        data: emptyToUndefined(parsed.data),
+      }),
+      ...(slugChanged
+        ? [
+            prisma.galleryImage.updateMany({
+              where: { styleSlug: existing.slug },
+              data: { styleSlug: parsed.data.slug },
+            }),
+          ]
+        : []),
+    ]);
     revalidateServices(style.slug);
-    if (existing.slug !== style.slug) revalidateServices(existing.slug);
+    if (slugChanged) revalidateServices(existing.slug);
     return { success: true, data: style };
   } catch (err) {
     return { success: false, error: mapPrismaError(err, 'No se pudo actualizar el estilo') };
@@ -216,11 +228,32 @@ export async function updateStyleSet(
   }
 
   try {
-    const set = await prisma.styleSet.update({
+    const existing = await prisma.styleSet.findUnique({
       where: { id },
-      data: emptyToUndefined(parsed.data),
-      include: { style: { select: { slug: true } } },
+      select: { slug: true, style: { select: { slug: true } } },
     });
+    if (!existing) return { success: false, error: 'Set no encontrado' };
+
+    const slugChanged = existing.slug !== parsed.data.slug;
+
+    const [set] = await prisma.$transaction([
+      prisma.styleSet.update({
+        where: { id },
+        data: emptyToUndefined(parsed.data),
+        include: { style: { select: { slug: true } } },
+      }),
+      ...(slugChanged
+        ? [
+            prisma.galleryImage.updateMany({
+              where: {
+                styleSlug: existing.style.slug,
+                setSlug: existing.slug,
+              },
+              data: { setSlug: parsed.data.slug },
+            }),
+          ]
+        : []),
+    ]);
     revalidateServices(set.style.slug);
     return { success: true, data: set };
   } catch (err) {

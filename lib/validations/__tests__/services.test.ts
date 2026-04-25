@@ -124,7 +124,6 @@ describe('styleSetSchema', () => {
   const base = {
     name: 'Jungla',
     slug: 'jungla',
-    images: [],
     standardPrice: 80000,
     premiumPrice: 120000,
     isActive: true,
@@ -151,14 +150,6 @@ describe('styleSetSchema', () => {
       customPrice: 150000,
     });
     expect(res.success).toBe(true);
-  });
-
-  it('rechaza más de 10 images', () => {
-    const res = styleSetSchema.safeParse({
-      ...base,
-      images: Array.from({ length: 11 }, () => 'https://picsum.photos/200'),
-    });
-    expect(res.success).toBe(false);
   });
 });
 

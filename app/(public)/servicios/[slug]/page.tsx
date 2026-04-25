@@ -45,7 +45,7 @@ export default async function StyleDetailPage({
 
   const [style, galleryImages] = await Promise.all([
     getStyleBySlug(slug),
-    getGalleryImages(slug),
+    getGalleryImages({ styleSlug: slug }),
   ]);
 
   if (!style) notFound();

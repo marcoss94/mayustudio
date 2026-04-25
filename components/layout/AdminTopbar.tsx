@@ -15,26 +15,19 @@ export async function AdminTopbar() {
   const role = user?.role;
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-outline-variant/20 bg-surface px-6 pl-16 md:pl-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-on-surface-variant">
-          Panel
-        </p>
-        <h1 className="font-serif text-base font-medium text-on-surface leading-tight">
-          Administración
-        </h1>
-      </div>
-
+    <header className="flex h-16 shrink-0 items-center justify-end border-b border-outline-variant/30 bg-surface-container-lowest px-6 pl-16 md:pl-6">
       <div className="flex items-center gap-3">
         <div className="text-right hidden sm:block">
           <p className="text-sm font-medium text-on-surface leading-tight">
             {user?.name ?? user?.email ?? 'Admin'}
           </p>
           {role && (
-            <p className="text-xs text-on-surface-variant leading-tight">{role}</p>
+            <p className="text-[0.7rem] uppercase tracking-wider text-on-surface-variant leading-tight">
+              {role}
+            </p>
           )}
         </div>
-        <div className="relative w-9 h-9 rounded-full overflow-hidden bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
+        <div className="relative w-9 h-9 rounded-full overflow-hidden bg-primary-container text-primary flex items-center justify-center shadow-sm">
           {user?.image ? (
             <Image
               src={user.image}

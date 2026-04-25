@@ -19,11 +19,11 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const hasError = Boolean(error);
 
     return (
-      <div className={cn('flex flex-col gap-1', containerClassName)}>
+      <div className={cn('flex flex-col gap-1.5', containerClassName)}>
         {label && (
           <label
             htmlFor={fieldId}
-            className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
+            className="text-xs font-medium uppercase tracking-wider text-on-surface-variant"
           >
             {label}
           </label>
@@ -35,12 +35,13 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           aria-invalid={hasError || undefined}
           aria-describedby={hasError ? `${fieldId}-error` : hint ? `${fieldId}-hint` : undefined}
           className={cn(
-            'w-full bg-transparent border py-2 px-3 text-base text-on-surface rounded-lg resize-y',
-            'focus:ring-0 focus:outline-none transition-colors',
+            'w-full rounded-lg border bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface resize-y',
+            'placeholder:text-on-surface-variant/50',
+            'transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20',
             hasError
               ? 'border-error focus:border-error'
-              : 'border-outline-variant focus:border-secondary',
-            props.disabled && 'opacity-60 cursor-not-allowed',
+              : 'border-outline-variant hover:border-outline focus:border-primary',
+            props.disabled && 'opacity-60 cursor-not-allowed bg-surface-container',
             className,
           )}
           {...props}

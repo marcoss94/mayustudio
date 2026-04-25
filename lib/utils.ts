@@ -1,9 +1,5 @@
 /**
  * lib/utils.ts — Utilidades compartidas de la aplicación
- *
- * - cn()             Combina clases Tailwind con deduplicación inteligente
- * - formatCurrency() Formatea montos en ARS (pesos argentinos)
- * - formatDate()     Formatea fechas en español de Argentina
  */
 
 import { clsx, type ClassValue } from 'clsx';
@@ -11,25 +7,13 @@ import { twMerge } from 'tailwind-merge';
 
 /**
  * Combina clases CSS con resolución de conflictos de Tailwind.
- * Usa clsx para condicionales y tailwind-merge para eliminar duplicados.
- *
- * @example
- * cn('px-4 py-2', condition && 'bg-primary', 'px-2') // → 'py-2 bg-primary px-2'
  */
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
 /**
- * Formatea un número como moneda argentina (ARS).
- *
- * @param amount   Monto numérico a formatear
- * @param currency Código ISO de moneda (default: 'ARS')
- * @returns        String formateado, e.g. "$ 1.500,00"
- *
- * @example
- * formatCurrency(1500)        // → '$ 1.500,00'
- * formatCurrency(99.9, 'USD') // → 'US$ 99,90'
+ * Formatea un número como moneda argentina (ARS por default).
  */
 export function formatCurrency(amount: number, currency = 'ARS'): string {
   return new Intl.NumberFormat('es-AR', {
@@ -41,15 +25,26 @@ export function formatCurrency(amount: number, currency = 'ARS'): string {
 }
 
 /**
- * Formatea una fecha en español de Argentina.
- *
- * @param date    Fecha a formatear (Date o string ISO)
- * @param options Opciones de Intl.DateTimeFormat (override)
- * @returns       String formateado, e.g. "11 de abril de 2026"
+ * Genera un slug URL-safe desde texto.
+ * Normaliza acentos, lowercase, espacios/símbolos → guiones, colapsa duplicados.
  *
  * @example
- * formatDate(new Date('2026-04-11')) // → '11 de abril de 2026'
- * formatDate('2026-04-11', { month: 'short' }) // → '11 abr 2026'
+ * slugify('Cake Smash Premium')    // 'cake-smash-premium'
+ * slugify('Día de las Madres')     // 'dia-de-las-madres'
+ * slugify('Set #1 — ¡Especial!')   // 'set-1-especial'
+ */
+export function slugify(input: string): string {
+  return input
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Formatea una fecha en español de Argentina.
  */
 export function formatDate(
   date: Date | string,

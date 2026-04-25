@@ -11,13 +11,13 @@ import {
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, X } from 'lucide-react';
-import type { StyleType } from '@prisma/client';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { Button } from '@/components/ui/Button';
 import { styleSchema, type StyleInput } from '@/lib/validations/services';
+import { slugify } from '@/lib/utils';
 
 export interface StyleFormProps {
   mode: 'create' | 'edit';
@@ -83,14 +83,45 @@ function toDateInput(date: Date | string | undefined): string {
   return d.toISOString().slice(0, 10);
 }
 
+const typeLabels: Record<string, string> = {
+  STANDARD: 'Standard',
+  SETS_AND_TIERS: 'Sets & Tiers',
+  SEASONAL: 'Temporada',
+};
+
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="pt-8 first:pt-0 border-t border-outline-variant/20 first:border-0">
+      <header className="mb-4">
+        <h3 className="font-serif text-lg italic text-on-surface">{title}</h3>
+        {description && (
+          <p className="mt-0.5 text-sm text-on-surface-variant">{description}</p>
+        )}
+      </header>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
+
 function HighlightsField({
   name,
   label,
+  description,
+  placeholder,
   control,
 }: {
   name: 'highlights' | 'tierStandardHighlights' | 'tierPremiumHighlights';
   label: string;
-  // RHF no tolera discriminated unions bien en useFieldArray — usamos FieldValues.
+  description?: string;
+  placeholder: string;
   control: Control<FieldValues>;
 }) {
   const { fields, append, remove } = useFieldArray({
@@ -99,36 +130,50 @@ function HighlightsField({
   });
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold">
-        {label}
-      </label>
-      <ul className="flex flex-col gap-2 list-none">
-        {fields.map((f, i) => (
-          <li key={f.id} className="flex gap-2 items-start">
-            <Controller
-              control={control}
-              name={`${name}.${i}`}
-              render={({ field }) => (
-                <Input
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  placeholder="Texto del highlight"
-                  containerClassName="flex-1"
-                />
-              )}
-            />
-            <button
-              type="button"
-              onClick={() => remove(i)}
-              aria-label="Quitar"
-              className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </li>
-        ))}
-      </ul>
+    <div className="flex flex-col gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-lowest/60 p-4">
+      <div>
+        <p className="text-sm font-medium text-on-surface">{label}</p>
+        {description && (
+          <p className="mt-0.5 text-xs text-on-surface-variant">{description}</p>
+        )}
+      </div>
+
+      {fields.length === 0 ? (
+        <p className="text-sm text-on-surface-variant italic">
+          Sin {label.toLowerCase()} aún. Agregá uno para empezar.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-2 list-none">
+          {fields.map((f, i) => (
+            <li key={f.id} className="flex gap-2 items-center">
+              <span className="text-xs font-mono text-on-surface-variant w-5 text-right shrink-0">
+                {i + 1}.
+              </span>
+              <Controller
+                control={control}
+                name={`${name}.${i}`}
+                render={({ field }) => (
+                  <Input
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    placeholder={placeholder}
+                    containerClassName="flex-1"
+                  />
+                )}
+              />
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                aria-label={`Quitar ${label.toLowerCase()} ${i + 1}`}
+                className="shrink-0 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container hover:text-error transition-colors"
+              >
+                <X className="w-4 h-4" strokeWidth={1.75} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <Button
         type="button"
         variant="soft"
@@ -163,6 +208,7 @@ export function StyleForm({ mode, initialData, onSubmit, onSuccess }: StyleFormP
   const currentType = watch('type');
   const isActive = watch('isActive');
   const isVisible = watch('isVisible');
+  const coverImage = watch('coverImage');
 
   async function submit(data: StyleInput) {
     setServerError(null);
@@ -174,221 +220,326 @@ export function StyleForm({ mode, initialData, onSubmit, onSuccess }: StyleFormP
     startTransition(() => onSuccess?.(data));
   }
 
+  const typedControl = control as unknown as Control<FieldValues>;
+
   return (
-    <form onSubmit={handleSubmit(submit)} className="space-y-6">
+    <form onSubmit={handleSubmit(submit)} className="space-y-0">
       {serverError && (
         <div
           role="alert"
-          className="rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm"
+          className="mb-6 rounded-lg bg-error-container text-on-error-container px-4 py-3 text-sm"
         >
           {serverError}
         </div>
       )}
 
-      {/* Sección: básico */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Nombre"
-          {...register('name')}
-          error={errors.name?.message}
-        />
-        <Input
-          label="Slug"
-          {...register('slug')}
-          hint="minúsculas y guiones. Ej: cake-smash"
-          error={errors.slug?.message}
-        />
-        <Select
-          label="Tipo"
-          {...register('type')}
-          disabled={mode === 'edit'}
-          options={[
-            { value: 'STANDARD', label: 'Standard' },
-            { value: 'SETS_AND_TIERS', label: 'Sets & Tiers' },
-            { value: 'SEASONAL', label: 'Temporada' },
-          ]}
-          containerClassName="md:col-span-1"
-        />
-        <Input
-          label="Orden"
-          type="number"
-          {...register('displayOrder', { valueAsNumber: true })}
-          error={errors.displayOrder?.message}
-        />
-        <Input
-          label="Badge"
-          {...register('badge')}
-          hint="ej: Nuevo, Popular"
-          error={errors.badge?.message}
-        />
-        <Input
-          label="Label"
-          {...register('label')}
-          hint="ej: Celebración Vibrante"
-          error={errors.label?.message}
-        />
-      </section>
+      <Section
+        title="Identidad"
+        description="Nombre interno y URL pública del estilo."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Nombre"
+            {...register('name')}
+            error={errors.name?.message}
+            placeholder="Ej: Cake Smash"
+          />
+          <div>
+            <Input
+              label="Slug"
+              {...register('slug')}
+              hint={
+                mode === 'edit'
+                  ? 'Cambiarlo rompe URLs públicas existentes'
+                  : 'minúsculas y guiones. Ej: cake-smash'
+              }
+              error={errors.slug?.message}
+              placeholder="cake-smash"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const name = watch('name');
+                if (name) setValue('slug', slugify(name), { shouldDirty: true, shouldValidate: true });
+              }}
+              className="mt-1.5 text-xs text-primary hover:underline font-medium"
+            >
+              Generar desde nombre
+            </button>
+          </div>
+          <Select
+            label="Tipo"
+            {...register('type')}
+            disabled={mode === 'edit'}
+            hint={mode === 'edit' ? 'No editable tras creación' : undefined}
+            options={[
+              { value: 'STANDARD', label: 'Standard' },
+              { value: 'SETS_AND_TIERS', label: 'Sets & Tiers' },
+              { value: 'SEASONAL', label: 'Temporada' },
+            ]}
+          />
+        </div>
+      </Section>
 
-      <section className="grid grid-cols-1 gap-4">
+      <Section
+        title="Presentación"
+        description="Cómo se muestra en las tarjetas del catálogo público."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Badge"
+            {...register('badge')}
+            hint="Etiqueta corta, ej: Nuevo, Popular"
+            error={errors.badge?.message}
+            placeholder="Nuevo"
+          />
+          <Input
+            label="Label"
+            {...register('label')}
+            hint="Subtítulo editorial, ej: Celebración Vibrante"
+            error={errors.label?.message}
+            placeholder="Celebración Vibrante"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
+          <Input
+            label="Cover image URL"
+            type="url"
+            {...register('coverImage')}
+            error={errors.coverImage?.message}
+            placeholder="https://..."
+            hint="Imagen principal del estilo"
+          />
+          {coverImage && (
+            <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-outline-variant/30 bg-surface-container">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={coverImage}
+                alt="Preview"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </Section>
+
+      <Section
+        title="Contenido"
+        description="Textos que aparecen en el sitio público."
+      >
         <Input
           label="Descripción corta"
           {...register('shortDescription')}
-          hint="máx 200 caracteres"
+          hint="Resumen para tarjetas del catálogo (máx 200 caracteres)"
           error={errors.shortDescription?.message}
+          placeholder="Una experiencia lúdica para celebrar el primer año..."
         />
         <Textarea
-          label="Descripción"
+          label="Descripción larga"
           rows={5}
           {...register('description')}
           error={errors.description?.message}
+          placeholder="Texto completo que aparece en la página del estilo."
         />
-        <Input
-          label="Cover image URL"
-          type="url"
-          {...register('coverImage')}
-          error={errors.coverImage?.message}
-          placeholder="https://..."
+      </Section>
+
+      <Section
+        title="Highlights"
+        description="Puntos destacados que aparecen como lista en la página del estilo."
+      >
+        <HighlightsField
+          name="highlights"
+          label="Highlights generales"
+          description="Se muestran en la página pública del estilo."
+          placeholder="Ej: Sesión de 45 minutos con acompañante"
+          control={typedControl}
         />
-      </section>
+      </Section>
 
-      <HighlightsField
-        name="highlights"
-        label="Highlights"
-        control={control as unknown as Control<FieldValues>}
-      />
-
-      {/* Sección específica por type */}
       {currentType === 'STANDARD' && (
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Precio (ARS)"
-            type="number"
-            step="0.01"
-            {...register('price', { valueAsNumber: true })}
-            // @ts-expect-error — errors es union
-            error={errors.price?.message}
-          />
-          <Input
-            label="Duración (min)"
-            type="number"
-            {...register('duration', { valueAsNumber: true })}
-            // @ts-expect-error — errors es union
-            error={errors.duration?.message}
-          />
-        </section>
+        <Section
+          title={`Configuración — ${typeLabels[currentType]}`}
+          description="Precio y duración fijos para este estilo."
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Precio (UYU)"
+              type="number"
+              step="0.01"
+              min="0"
+              {...register('price', { valueAsNumber: true })}
+              // @ts-expect-error — errors es union
+              error={errors.price?.message}
+              placeholder="55000"
+            />
+            <Input
+              label="Duración (min)"
+              type="number"
+              min="1"
+              {...register('duration', { valueAsNumber: true })}
+              // @ts-expect-error — errors es union
+              error={errors.duration?.message}
+              placeholder="60"
+            />
+          </div>
+        </Section>
       )}
 
       {currentType === 'SEASONAL' && (
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Precio (ARS)"
-            type="number"
-            step="0.01"
-            {...register('price', { valueAsNumber: true })}
-            // @ts-expect-error — errors es union
-            error={errors.price?.message}
-          />
-          <Input
-            label="Duración (min)"
-            type="number"
-            {...register('duration', { valueAsNumber: true })}
-            // @ts-expect-error — errors es union
-            error={errors.duration?.message}
-          />
-          <Controller
-            control={control}
-            name="seasonStart"
-            render={({ field }) => (
-              <Input
-                label="Inicio temporada"
-                type="date"
-                value={toDateInput(field.value as Date | string | undefined)}
-                onChange={(e) =>
-                  field.onChange(e.target.value ? new Date(e.target.value) : undefined)
-                }
-                // @ts-expect-error — errors es union
-                error={errors.seasonStart?.message}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="seasonEnd"
-            render={({ field }) => (
-              <Input
-                label="Fin temporada"
-                type="date"
-                value={toDateInput(field.value as Date | string | undefined)}
-                onChange={(e) =>
-                  field.onChange(e.target.value ? new Date(e.target.value) : undefined)
-                }
-                // @ts-expect-error — errors es union
-                error={errors.seasonEnd?.message}
-              />
-            )}
-          />
-        </section>
+        <Section
+          title={`Configuración — ${typeLabels[currentType]}`}
+          description="Precio fijo + rango de fechas en que aparece en el sitio público."
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Precio (UYU)"
+              type="number"
+              step="0.01"
+              min="0"
+              {...register('price', { valueAsNumber: true })}
+              // @ts-expect-error — errors es union
+              error={errors.price?.message}
+            />
+            <Input
+              label="Duración (min)"
+              type="number"
+              min="1"
+              {...register('duration', { valueAsNumber: true })}
+              // @ts-expect-error — errors es union
+              error={errors.duration?.message}
+            />
+            <Controller
+              control={control}
+              name="seasonStart"
+              render={({ field }) => (
+                <Input
+                  label="Inicio temporada"
+                  type="date"
+                  value={toDateInput(field.value as Date | string | undefined)}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? new Date(e.target.value) : undefined)
+                  }
+                  // @ts-expect-error — errors es union
+                  error={errors.seasonStart?.message}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="seasonEnd"
+              render={({ field }) => (
+                <Input
+                  label="Fin temporada"
+                  type="date"
+                  value={toDateInput(field.value as Date | string | undefined)}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? new Date(e.target.value) : undefined)
+                  }
+                  // @ts-expect-error — errors es union
+                  error={errors.seasonEnd?.message}
+                />
+              )}
+            />
+          </div>
+        </Section>
       )}
 
       {currentType === 'SETS_AND_TIERS' && (
-        <>
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Standard — duración (min)"
-              type="number"
-              {...register('tierStandardDuration', { valueAsNumber: true })}
-              // @ts-expect-error — errors es union
-              error={errors.tierStandardDuration?.message}
-            />
-            <Input
-              label="Premium — duración (min)"
-              type="number"
-              {...register('tierPremiumDuration', { valueAsNumber: true })}
-              // @ts-expect-error — errors es union
-              error={errors.tierPremiumDuration?.message}
-            />
-            <Input
-              label="Standard — tagline"
-              {...register('tierStandardTagline')}
-              // @ts-expect-error — errors es union
-              error={errors.tierStandardTagline?.message}
-            />
-            <Input
-              label="Premium — tagline"
-              {...register('tierPremiumTagline')}
-              // @ts-expect-error — errors es union
-              error={errors.tierPremiumTagline?.message}
-            />
-          </section>
-          <HighlightsField
-            name="tierStandardHighlights"
-            label="Standard — Highlights"
-            control={control as unknown as Control<FieldValues>}
-          />
-          <HighlightsField
-            name="tierPremiumHighlights"
-            label="Premium — Highlights"
-            control={control as unknown as Control<FieldValues>}
-          />
-        </>
+        <Section
+          title={`Configuración — ${typeLabels[currentType]}`}
+          description="Este tipo se compone de sets (se editan aparte). Acá configurás los tiers Standard y Premium compartidos."
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4 rounded-xl border border-outline-variant/30 bg-surface-container-lowest/60 p-4">
+              <p className="font-serif italic text-on-surface">Tier Standard</p>
+              <Input
+                label="Duración (min)"
+                type="number"
+                min="1"
+                {...register('tierStandardDuration', { valueAsNumber: true })}
+                // @ts-expect-error — errors es union
+                error={errors.tierStandardDuration?.message}
+              />
+              <Input
+                label="Tagline"
+                {...register('tierStandardTagline')}
+                hint="Frase corta del tier"
+                // @ts-expect-error — errors es union
+                error={errors.tierStandardTagline?.message}
+              />
+              <HighlightsField
+                name="tierStandardHighlights"
+                label="Highlights Standard"
+                placeholder="Ej: 8 fotos editadas"
+                control={typedControl}
+              />
+            </div>
+
+            <div className="space-y-4 rounded-xl border border-outline-variant/30 bg-surface-container-lowest/60 p-4">
+              <p className="font-serif italic text-on-surface">Tier Premium</p>
+              <Input
+                label="Duración (min)"
+                type="number"
+                min="1"
+                {...register('tierPremiumDuration', { valueAsNumber: true })}
+                // @ts-expect-error — errors es union
+                error={errors.tierPremiumDuration?.message}
+              />
+              <Input
+                label="Tagline"
+                {...register('tierPremiumTagline')}
+                hint="Frase corta del tier"
+                // @ts-expect-error — errors es union
+                error={errors.tierPremiumTagline?.message}
+              />
+              <HighlightsField
+                name="tierPremiumHighlights"
+                label="Highlights Premium"
+                placeholder="Ej: 20 fotos + álbum físico"
+                control={typedControl}
+              />
+            </div>
+          </div>
+        </Section>
       )}
 
-      <section className="flex flex-wrap gap-6 pt-4 border-t border-outline-variant/20">
-        <Switch
-          checked={isActive}
-          onCheckedChange={(v) => setValue('isActive', v, { shouldDirty: true })}
-          label="Activo"
-          description="visible en el catálogo"
-        />
-        <Switch
-          checked={isVisible}
-          onCheckedChange={(v) => setValue('isVisible', v, { shouldDirty: true })}
-          label="Visible"
-          description="aparece en listas públicas"
-        />
-      </section>
+      <Section
+        title="Ordenación y estado"
+        description="Dónde aparece y si es visible en el sitio público."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr] gap-6 items-start">
+          <Input
+            label="Orden"
+            type="number"
+            min="0"
+            {...register('displayOrder', { valueAsNumber: true })}
+            hint="Menor = aparece primero"
+            error={errors.displayOrder?.message}
+          />
+          <div className="pt-6 md:pt-7">
+            <Switch
+              checked={isActive}
+              onCheckedChange={(v) => setValue('isActive', v, { shouldDirty: true })}
+              label="Activo"
+              description="Se puede reservar"
+            />
+          </div>
+          <div className="pt-6 md:pt-7">
+            <Switch
+              checked={isVisible}
+              onCheckedChange={(v) => setValue('isVisible', v, { shouldDirty: true })}
+              label="Visible"
+              description="Aparece en el catálogo público"
+            />
+          </div>
+        </div>
+      </Section>
 
-      <div className="flex justify-end gap-2">
+      <div className="sticky bottom-0 -mx-6 md:-mx-8 mt-8 border-t border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur px-6 md:px-8 py-4 flex justify-end gap-2">
         <Button
           type="submit"
           variant="primary"

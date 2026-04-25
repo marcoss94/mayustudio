@@ -49,31 +49,19 @@ export function GalleryItem({
      */
     <figure
       className={cn(
-        'group relative break-inside-avoid',
-        // En masonry columns, el figure debe ser block (no inline-block)
-        // para que la altura sea natural. overflow-hidden en el wrapper interno.
+        'group relative aspect-square w-full',
         'rounded-lg overflow-hidden',
         'shadow-[var(--shadow-tonal-sm)]',
-        // Transición de sombra en hover
         'transition-shadow duration-300 hover:shadow-[var(--shadow-tonal-md)]',
         className,
       )}
     >
-      {/*
-        next/image con fill requiere que el padre tenga position: relative y dimensiones.
-        Aquí usamos width: 100% y la imagen dicta la altura via aspect-ratio natural
-        usando el patrón img como bloque (no fill).
-
-        Solución: usamos width/height con layout="responsive" pattern en v14+.
-        Para masonry lo más limpio es img con width=100% y height=auto.
-      */}
       <Image
         src={url}
         alt={alt}
-        width={800}
-        height={600}
+        fill
         sizes={sizes}
-        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+        className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
         priority={priority}
       />
 

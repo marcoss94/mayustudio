@@ -12,7 +12,6 @@
  */
 
 import { headers } from 'next/headers';
-import * as Sentry from '@sentry/nextjs';
 import { Resend } from 'resend';
 import React from 'react';
 
@@ -132,12 +131,10 @@ export async function contactAction(
 
     return { success: true, data: undefined };
   } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: 'contactAction' },
-      extra: { ip, serviceSlug: data.serviceSlug },
+    console.error('[ContactAction] Error al enviar email:', error, {
+      ip,
+      serviceSlug: data.serviceSlug,
     });
-
-    console.error('[ContactAction] Error al enviar email:', error);
 
     return {
       success: false,

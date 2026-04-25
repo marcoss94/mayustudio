@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function FineArtPage() {
   const [style, galleryImages] = await Promise.all([
     getStyleBySlug('fine-art'),
-    getGalleryImages('fine-art'),
+    getGalleryImages({ styleSlug: 'fine-art' }),
   ]);
 
   const images = galleryImages.slice(0, 6);

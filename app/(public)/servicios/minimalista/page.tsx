@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function MinimalistaPage() {
   const [style, galleryImages] = await Promise.all([
     getStyleBySlug('minimalista'),
-    getGalleryImages('minimalista'),
+    getGalleryImages({ styleSlug: 'minimalista' }),
   ]);
 
   const images = galleryImages.slice(0, 6);

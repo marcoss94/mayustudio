@@ -18,8 +18,15 @@ import {
 import type { StyleSetInput } from '@/lib/validations/services';
 import { StyleSetForm } from './StyleSetForm';
 import type { SerializedStyle, SerializedSet } from './types';
+import type { GalleryImageRow, StyleWithSets } from '@/app/(admin)/admin/galeria/GalleryGrid';
 
-export function StyleSetsTab({ style }: { style: SerializedStyle }) {
+export interface StyleSetsTabProps {
+  style: SerializedStyle;
+  galleryImages: GalleryImageRow[];
+  styleSlugs: StyleWithSets[];
+}
+
+export function StyleSetsTab({ style, galleryImages, styleSlugs }: StyleSetsTabProps) {
   const router = useRouter();
   const [editing, setEditing] = useState<SerializedSet | null>(null);
   const [creating, setCreating] = useState(false);
@@ -143,7 +150,13 @@ export function StyleSetsTab({ style }: { style: SerializedStyle }) {
         title="Nuevo set"
         size="lg"
       >
-        <StyleSetForm onSubmit={handleCreate} onCancel={() => setCreating(false)} />
+        <StyleSetForm
+          styleSlug={style.slug}
+          styleSlugs={styleSlugs}
+          galleryImages={galleryImages}
+          onSubmit={handleCreate}
+          onCancel={() => setCreating(false)}
+        />
       </Modal>
 
       <Modal
@@ -154,12 +167,15 @@ export function StyleSetsTab({ style }: { style: SerializedStyle }) {
       >
         {editing && (
           <StyleSetForm
+            styleSlug={style.slug}
+            setSlug={editing.slug}
+            styleSlugs={styleSlugs}
+            galleryImages={galleryImages}
             initialData={{
               name: editing.name,
               slug: editing.slug,
               description: editing.description ?? '',
               coverImage: editing.coverImage ?? '',
-              images: editing.images,
               standardPrice: editing.standardPrice,
               premiumPrice: editing.premiumPrice,
               customPrice: editing.customPrice ?? null,

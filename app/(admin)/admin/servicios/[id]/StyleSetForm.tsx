@@ -1,15 +1,21 @@
 'use client';
 
-import { useForm, useFieldArray, Controller, type Resolver } from 'react-hook-form';
+import { useForm, Controller, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, X } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Switch } from '@/components/ui/Switch';
 import { Button } from '@/components/ui/Button';
+import { EmbeddedGalleryManager } from '@/components/admin/EmbeddedGalleryManager';
 import { styleSetSchema, type StyleSetInput } from '@/lib/validations/services';
+import { slugify } from '@/lib/utils';
+import type { GalleryImageRow, StyleWithSets } from '@/app/(admin)/admin/galeria/GalleryGrid';
 
 export interface StyleSetFormProps {
+  styleSlug: string;
+  setSlug?: string;
+  styleSlugs: StyleWithSets[];
+  galleryImages: GalleryImageRow[];
   initialData?: Partial<StyleSetInput>;
   onSubmit: (data: StyleSetInput) => Promise<{ success: boolean; error?: string }>;
   onCancel: () => void;
@@ -21,7 +27,6 @@ function defaults(initial?: Partial<StyleSetInput>): StyleSetInput {
     slug: initial?.slug ?? '',
     description: initial?.description ?? '',
     coverImage: initial?.coverImage ?? '',
-    images: initial?.images ?? [],
     standardPrice: initial?.standardPrice ?? 0,
     premiumPrice: initial?.premiumPrice ?? 0,
     isCustom: initial?.isCustom ?? false,
@@ -31,7 +36,15 @@ function defaults(initial?: Partial<StyleSetInput>): StyleSetInput {
   };
 }
 
-export function StyleSetForm({ initialData, onSubmit, onCancel }: StyleSetFormProps) {
+export function StyleSetForm({
+  styleSlug,
+  setSlug,
+  styleSlugs,
+  galleryImages,
+  initialData,
+  onSubmit,
+  onCancel,
+}: StyleSetFormProps) {
   const {
     register,
     handleSubmit,
@@ -44,11 +57,6 @@ export function StyleSetForm({ initialData, onSubmit, onCancel }: StyleSetFormPr
     defaultValues: defaults(initialData),
   });
 
-  const { fields, append, remove } = useFieldArray<StyleSetInput>({
-    control,
-    // @ts-expect-error — arrays of strings tipado como never en RHF strict
-    name: 'images',
-  });
   const isCustom = watch('isCustom');
   const isActive = watch('isActive');
 
@@ -68,12 +76,24 @@ export function StyleSetForm({ initialData, onSubmit, onCancel }: StyleSetFormPr
           {...register('name')}
           error={errors.name?.message}
         />
-        <Input
-          label="Slug"
-          {...register('slug')}
-          error={errors.slug?.message}
-          hint="minúsculas-con-guiones"
-        />
+        <div>
+          <Input
+            label="Slug"
+            {...register('slug')}
+            error={errors.slug?.message}
+            hint="minúsculas-con-guiones"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const name = watch('name');
+              if (name) setValue('slug', slugify(name), { shouldDirty: true, shouldValidate: true });
+            }}
+            className="mt-1.5 text-xs text-primary hover:underline font-medium"
+          >
+            Generar desde nombre
+          </button>
+        </div>
       </div>
 
       <Textarea
@@ -134,46 +154,6 @@ export function StyleSetForm({ initialData, onSubmit, onCancel }: StyleSetFormPr
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold">
-          Imágenes (URLs)
-        </label>
-        <ul className="flex flex-col gap-2 list-none">
-          {fields.map((f, i) => (
-            <li key={f.id} className="flex gap-2 items-start">
-              <Input
-                {...register(`images.${i}` as const)}
-                placeholder="https://..."
-                containerClassName="flex-1"
-              />
-              <button
-                type="button"
-                onClick={() => remove(i)}
-                aria-label="Quitar"
-                className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
-        <Button
-          type="button"
-          variant="soft"
-          size="sm"
-          onClick={() => append('' as never)}
-          className="self-start"
-        >
-          <Plus className="w-3 h-3" />
-          Agregar URL
-        </Button>
-        {errors.images && (
-          <p className="text-xs text-error">
-            {errors.images.message ?? 'URL inválida en la lista'}
-          </p>
-        )}
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Orden"
@@ -189,6 +169,24 @@ export function StyleSetForm({ initialData, onSubmit, onCancel }: StyleSetFormPr
           />
         </div>
       </div>
+
+      <section className="pt-6 border-t border-outline-variant/20">
+        <header className="mb-3">
+          <h4 className="font-serif text-base italic text-on-surface">Galería del set</h4>
+          <p className="mt-0.5 text-xs text-on-surface-variant">
+            Fotos específicas de este set — aparecen en /servicios/{styleSlug}/{setSlug ?? '[slug]'}.
+          </p>
+        </header>
+        <EmbeddedGalleryManager
+          styleSlug={styleSlug}
+          setSlug={setSlug ?? null}
+          enabled={Boolean(setSlug)}
+          images={setSlug ? galleryImages.filter((i) => i.setSlug === setSlug) : []}
+          styleSlugs={styleSlugs}
+          pendingMessage="Guardá el set primero para poder agregar fotos."
+          emptyMessage="Sin fotos del set todavía."
+        />
+      </section>
 
       <div className="flex justify-end gap-2 pt-4 border-t border-outline-variant/20">
         <Button type="button" variant="soft" onClick={onCancel} disabled={isSubmitting}>

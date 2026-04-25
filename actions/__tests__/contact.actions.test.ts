@@ -5,7 +5,6 @@
  * Mocks necesarios:
  *  - next/headers → headers() (Server Action infra)
  *  - resend       → Resend.emails.send
- *  - @sentry/nextjs → captureException
  *  - @/emails/*   → componentes React de email (no son relevantes para los tests)
  *  - react-dom/server → renderToStaticMarkup
  */
@@ -27,11 +26,6 @@ vi.mock('resend', () => {
   };
   return { Resend: ResendMock };
 });
-
-// Mock de Sentry
-vi.mock('@sentry/nextjs', () => ({
-  captureException: vi.fn(),
-}));
 
 // Mock de los templates de email (no testeamos su renderizado aquí)
 vi.mock('@/emails/contact-notification', () => ({

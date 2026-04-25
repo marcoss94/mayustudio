@@ -18,11 +18,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const hasError = Boolean(error);
 
     return (
-      <div className={cn('flex flex-col gap-1', containerClassName)}>
+      <div className={cn('flex flex-col gap-1.5', containerClassName)}>
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
+            className="text-xs font-medium uppercase tracking-wider text-on-surface-variant"
           >
             {label}
           </label>
@@ -33,12 +33,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           aria-invalid={hasError || undefined}
           aria-describedby={hasError ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
           className={cn(
-            'w-full bg-transparent border-0 border-b py-2 text-base text-on-surface',
-            'focus:ring-0 focus:outline-none transition-colors',
+            'w-full rounded-lg border bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface',
+            'placeholder:text-on-surface-variant/50',
+            'transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20',
             hasError
               ? 'border-error focus:border-error'
-              : 'border-outline-variant focus:border-secondary',
-            props.disabled && 'opacity-60 cursor-not-allowed',
+              : 'border-outline-variant hover:border-outline focus:border-primary',
+            props.disabled && 'opacity-60 cursor-not-allowed bg-surface-container',
             className,
           )}
           {...props}

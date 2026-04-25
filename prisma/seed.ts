@@ -114,14 +114,6 @@ async function main() {
         slug: 'jungla',
         description: 'Set tropical con plantas, animales y colores vibrantes.',
         coverImage: 'https://picsum.photos/seed/set-jungla/800/600',
-        images: [
-          'https://picsum.photos/seed/jungla-1/600/750',
-          'https://picsum.photos/seed/jungla-2/600/750',
-          'https://picsum.photos/seed/jungla-3/600/750',
-          'https://picsum.photos/seed/jungla-4/600/750',
-          'https://picsum.photos/seed/jungla-5/600/750',
-          'https://picsum.photos/seed/jungla-6/600/750',
-        ],
         standardPrice: 40000,
         premiumPrice: 55000,
         displayOrder: 1,
@@ -132,14 +124,6 @@ async function main() {
         slug: 'princesa',
         description: 'Set de fantasía con coronas, tules y tonos pastel.',
         coverImage: 'https://picsum.photos/seed/set-princesa/800/600',
-        images: [
-          'https://picsum.photos/seed/princesa-1/600/750',
-          'https://picsum.photos/seed/princesa-2/600/750',
-          'https://picsum.photos/seed/princesa-3/600/750',
-          'https://picsum.photos/seed/princesa-4/600/750',
-          'https://picsum.photos/seed/princesa-5/600/750',
-          'https://picsum.photos/seed/princesa-6/600/750',
-        ],
         standardPrice: 42000,
         premiumPrice: 58000,
         displayOrder: 2,
@@ -150,14 +134,6 @@ async function main() {
         slug: 'aventurero',
         description: 'Set rústico con elementos de exploración y naturaleza.',
         coverImage: 'https://picsum.photos/seed/set-aventurero/800/600',
-        images: [
-          'https://picsum.photos/seed/aventurero-1/600/750',
-          'https://picsum.photos/seed/aventurero-2/600/750',
-          'https://picsum.photos/seed/aventurero-3/600/750',
-          'https://picsum.photos/seed/aventurero-4/600/750',
-          'https://picsum.photos/seed/aventurero-5/600/750',
-          'https://picsum.photos/seed/aventurero-6/600/750',
-        ],
         standardPrice: 40000,
         premiumPrice: 55000,
         displayOrder: 3,
@@ -252,6 +228,25 @@ async function main() {
       { url: 'https://picsum.photos/seed/g16/800/800', alt: 'Sesión al aire libre', order: 16 },
       { url: 'https://picsum.photos/seed/g17/800/1200', alt: 'Cobertura de evento cumpleaños', order: 17 },
       { url: 'https://picsum.photos/seed/g18/800/600', alt: 'Día de las madres especial', styleSlug: 'dia-de-las-madres', order: 18 },
+      // Fotos de sets Cake Smash (antes en StyleSet.images[])
+      { url: 'https://picsum.photos/seed/jungla-1/600/750', alt: 'Jungla escena 1', styleSlug: 'cake-smash', setSlug: 'jungla', order: 1 },
+      { url: 'https://picsum.photos/seed/jungla-2/600/750', alt: 'Jungla escena 2', styleSlug: 'cake-smash', setSlug: 'jungla', order: 2 },
+      { url: 'https://picsum.photos/seed/jungla-3/600/750', alt: 'Jungla escena 3', styleSlug: 'cake-smash', setSlug: 'jungla', order: 3 },
+      { url: 'https://picsum.photos/seed/jungla-4/600/750', alt: 'Jungla escena 4', styleSlug: 'cake-smash', setSlug: 'jungla', order: 4 },
+      { url: 'https://picsum.photos/seed/jungla-5/600/750', alt: 'Jungla escena 5', styleSlug: 'cake-smash', setSlug: 'jungla', order: 5 },
+      { url: 'https://picsum.photos/seed/jungla-6/600/750', alt: 'Jungla escena 6', styleSlug: 'cake-smash', setSlug: 'jungla', order: 6 },
+      { url: 'https://picsum.photos/seed/princesa-1/600/750', alt: 'Princesa escena 1', styleSlug: 'cake-smash', setSlug: 'princesa', order: 1 },
+      { url: 'https://picsum.photos/seed/princesa-2/600/750', alt: 'Princesa escena 2', styleSlug: 'cake-smash', setSlug: 'princesa', order: 2 },
+      { url: 'https://picsum.photos/seed/princesa-3/600/750', alt: 'Princesa escena 3', styleSlug: 'cake-smash', setSlug: 'princesa', order: 3 },
+      { url: 'https://picsum.photos/seed/princesa-4/600/750', alt: 'Princesa escena 4', styleSlug: 'cake-smash', setSlug: 'princesa', order: 4 },
+      { url: 'https://picsum.photos/seed/princesa-5/600/750', alt: 'Princesa escena 5', styleSlug: 'cake-smash', setSlug: 'princesa', order: 5 },
+      { url: 'https://picsum.photos/seed/princesa-6/600/750', alt: 'Princesa escena 6', styleSlug: 'cake-smash', setSlug: 'princesa', order: 6 },
+      { url: 'https://picsum.photos/seed/aventurero-1/600/750', alt: 'Aventurero escena 1', styleSlug: 'cake-smash', setSlug: 'aventurero', order: 1 },
+      { url: 'https://picsum.photos/seed/aventurero-2/600/750', alt: 'Aventurero escena 2', styleSlug: 'cake-smash', setSlug: 'aventurero', order: 2 },
+      { url: 'https://picsum.photos/seed/aventurero-3/600/750', alt: 'Aventurero escena 3', styleSlug: 'cake-smash', setSlug: 'aventurero', order: 3 },
+      { url: 'https://picsum.photos/seed/aventurero-4/600/750', alt: 'Aventurero escena 4', styleSlug: 'cake-smash', setSlug: 'aventurero', order: 4 },
+      { url: 'https://picsum.photos/seed/aventurero-5/600/750', alt: 'Aventurero escena 5', styleSlug: 'cake-smash', setSlug: 'aventurero', order: 5 },
+      { url: 'https://picsum.photos/seed/aventurero-6/600/750', alt: 'Aventurero escena 6', styleSlug: 'cake-smash', setSlug: 'aventurero', order: 6 },
     ],
   });
 
@@ -284,8 +279,91 @@ async function main() {
     );
   }
 
+  // ─── Reservas test (M5 QA) ───────────────────────────────────────────
+
+  const cakeSmashId = (await prisma.style.findUniqueOrThrow({ where: { slug: 'cake-smash' }, select: { id: true } })).id;
+  const fineArtId = (await prisma.style.findUniqueOrThrow({ where: { slug: 'fine-art' }, select: { id: true } })).id;
+  const minimalistaId = (await prisma.style.findUniqueOrThrow({ where: { slug: 'minimalista' }, select: { id: true } })).id;
+  const junglaId = (await prisma.styleSet.findFirstOrThrow({ where: { slug: 'jungla' }, select: { id: true } })).id;
+  const princesaId = (await prisma.styleSet.findFirstOrThrow({ where: { slug: 'princesa' }, select: { id: true } })).id;
+
+  const passwordHash = await bcrypt.hash('demo1234', 10);
+  const clientUsers = await Promise.all(
+    [
+      { email: 'ana.garcia@demo.com', name: 'Ana García' },
+      { email: 'maria.lopez@demo.com', name: 'María López' },
+      { email: 'lucia.ferrari@demo.com', name: 'Lucía Ferrari' },
+      { email: 'sofia.benitez@demo.com', name: 'Sofía Benítez' },
+      { email: 'camila.silva@demo.com', name: 'Camila Silva' },
+    ].map((u) =>
+      prisma.user.upsert({
+        where: { email: u.email },
+        update: {},
+        create: { ...u, password: passwordHash, role: 'CLIENT' },
+      }),
+    ),
+  );
+
+  const now = new Date();
+  const day = (offset: number, h = 10) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + offset);
+    d.setHours(h, 0, 0, 0);
+    return d;
+  };
+
+  await prisma.reservation.createMany({
+    data: [
+      {
+        userId: clientUsers[0]!.id, status: 'DRAFT',
+        startsAt: day(7, 11), endsAt: day(7, 12),
+        childName: 'Mateo', childAge: 12, totalAmount: 40000,
+        styleId: cakeSmashId, styleSetId: junglaId, tier: 'standard',
+      },
+      {
+        userId: clientUsers[1]!.id, status: 'PENDING_PAYMENT',
+        startsAt: day(3, 15), endsAt: day(3, 16),
+        childName: 'Olivia', childAge: 12, totalAmount: 58000,
+        styleId: cakeSmashId, styleSetId: princesaId, tier: 'premium',
+        expiresAt: new Date(now.getTime() + 8 * 60 * 1000),
+      },
+      {
+        userId: clientUsers[2]!.id, status: 'CONFIRMED',
+        startsAt: day(14, 10), endsAt: day(14, 11),
+        childName: 'Joaquín', childAge: 6, totalAmount: 55000,
+        styleId: fineArtId,
+      },
+      {
+        userId: clientUsers[3]!.id, status: 'CONFIRMED',
+        startsAt: day(10, 16), endsAt: day(10, 17),
+        childName: 'Emma', childAge: 18, totalAmount: 100000,
+        styleId: cakeSmashId, styleSetId: junglaId, tier: 'premium',
+        isExperienciaCompleta: true, eventDurationHours: 4, eventPrice: 100000, comboDiscount: 20000,
+      },
+      {
+        userId: clientUsers[4]!.id, status: 'EXPIRED',
+        startsAt: day(-5, 11), endsAt: day(-5, 12),
+        childName: 'Tomás', childAge: 12, totalAmount: 40000,
+        styleId: cakeSmashId, styleSetId: princesaId, tier: 'standard',
+        expiresAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: clientUsers[0]!.id, status: 'COMPLETED',
+        startsAt: day(-30, 10), endsAt: day(-30, 11),
+        childName: 'Mateo', childAge: 11, totalAmount: 38000,
+        styleId: minimalistaId, notes: 'Sesión perfecta. Cliente muy contenta.',
+      },
+      {
+        userId: clientUsers[1]!.id, status: 'CANCELLED',
+        startsAt: day(-2, 14), endsAt: day(-2, 15),
+        childName: 'Olivia', childAge: 11, totalAmount: 55000,
+        styleId: fineArtId, notes: 'Cliente canceló por enfermedad del bebé.',
+      },
+    ],
+  });
+
   console.log(
-    `Seed completado: 4 estilos (3 base + 1 estacional), 4 sets Cake Smash, 3 extras Minimalista, 1 config Experiencia Completa, 18 imágenes`,
+    `Seed completado: 4 estilos, 4 sets, 3 extras, 1 config Experiencia, 36 imágenes, 5 clientes test, 7 reservas test`,
   );
 }
 

@@ -24,6 +24,35 @@ export default async function StyleDetailPage({
 
   if (!style) notFound();
 
+  const galleryImages = await prisma.galleryImage.findMany({
+    where: { styleSlug: style.slug },
+    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+    select: {
+      id: true,
+      url: true,
+      alt: true,
+      caption: true,
+      order: true,
+      isVisible: true,
+      styleSlug: true,
+      setSlug: true,
+    },
+  });
+
+  const styleSlugs = await prisma.style.findMany({
+    where: { isActive: true },
+    select: {
+      slug: true,
+      name: true,
+      sets: {
+        where: { isActive: true },
+        select: { slug: true, name: true },
+        orderBy: { displayOrder: 'asc' },
+      },
+    },
+    orderBy: { displayOrder: 'asc' },
+  });
+
   const serialized = {
     id: style.id,
     name: style.name,
@@ -54,7 +83,6 @@ export default async function StyleDetailPage({
       slug: s.slug,
       description: s.description,
       coverImage: s.coverImage,
-      images: s.images,
       standardPrice: s.standardPrice.toNumber(),
       premiumPrice: s.premiumPrice.toNumber(),
       customPrice: s.customPrice?.toNumber() ?? null,
@@ -85,7 +113,11 @@ export default async function StyleDetailPage({
         description={`/${style.slug} · ${style.type}`}
       />
 
-      <DetailTabs style={serialized} />
+      <DetailTabs
+        style={serialized}
+        galleryImages={galleryImages}
+        styleSlugs={styleSlugs}
+      />
     </>
   );
 }

@@ -18,7 +18,6 @@ export interface StyleSetDetail {
   slug: string;
   description: string | null;
   coverImage: string | null;
-  images: string[];
   standardPrice: number;
   premiumPrice: number;
   isCustom: boolean;

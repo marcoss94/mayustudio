@@ -6,10 +6,17 @@ import { StyleGeneralForm } from './StyleGeneralForm';
 import { StyleSetsTab } from './StyleSetsTab';
 import { StyleExtrasTab } from './StyleExtrasTab';
 import type { SerializedStyle } from './types';
+import type { GalleryImageRow, StyleWithSets } from '@/app/(admin)/admin/galeria/GalleryGrid';
 
 type TabKey = 'general' | 'sets' | 'extras';
 
-export function DetailTabs({ style }: { style: SerializedStyle }) {
+export interface DetailTabsProps {
+  style: SerializedStyle;
+  galleryImages: GalleryImageRow[];
+  styleSlugs: StyleWithSets[];
+}
+
+export function DetailTabs({ style, galleryImages, styleSlugs }: DetailTabsProps) {
   const router = useRouter();
   const params = useSearchParams();
   const hasSets = style.type === 'SETS_AND_TIERS';
@@ -56,8 +63,20 @@ export function DetailTabs({ style }: { style: SerializedStyle }) {
       </nav>
 
       <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 md:p-8">
-        {current === 'general' && <StyleGeneralForm style={style} />}
-        {current === 'sets' && hasSets && <StyleSetsTab style={style} />}
+        {current === 'general' && (
+          <StyleGeneralForm
+            style={style}
+            galleryImages={galleryImages}
+            styleSlugs={styleSlugs}
+          />
+        )}
+        {current === 'sets' && hasSets && (
+          <StyleSetsTab
+            style={style}
+            galleryImages={galleryImages}
+            styleSlugs={styleSlugs}
+          />
+        )}
         {current === 'extras' && <StyleExtrasTab style={style} />}
       </div>
     </div>

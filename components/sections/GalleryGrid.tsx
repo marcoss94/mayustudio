@@ -1,20 +1,15 @@
 'use client';
 
 /**
- * GalleryGrid.tsx — Grid de galería con filtros por categoría
+ * GalleryGrid.tsx — Grid masonry con filtros + infinite scroll progresivo.
  *
- * Client Component — necesita estado para los filtros y animaciones.
- *
- * Layout masonry con CSS columns:
- * - Mobile: 2 columnas
- * - Tablet (sm): 2 columnas
- * - Desktop (lg): 3 columnas
- * - Desktop ancho (xl): 4 columnas
- *
- * Filtros: pills horizontales con scroll en mobile, sin re-fetch al filtrar.
+ * - Render inicial: BATCH_SIZE imágenes
+ * - Sentinel observado con IntersectionObserver carga el siguiente batch
+ * - Animación fade+slide-up con stagger al aparecer
+ * - Reset al cambiar filtro
  */
 
-import { useState, useTransition } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { GalleryItem } from '@/components/ui/GalleryItem';
 
@@ -34,34 +29,66 @@ export interface GalleryService {
 export interface GalleryGridProps {
   images: GalleryImage[];
   services: GalleryService[];
+  /** Cantidad de imágenes por batch. Default 12. */
+  batchSize?: number;
 }
 
-const GALLERY_SIZES =
-  '(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 33vw';
-
+const GALLERY_SIZES = '(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 33vw';
 const ALL_FILTER = '__all__';
 
-export function GalleryGrid({ images, services }: GalleryGridProps) {
+export function GalleryGrid({ images, services, batchSize = 12 }: GalleryGridProps) {
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
+  const [visibleCount, setVisibleCount] = useState(batchSize);
   const [isPending, startTransition] = useTransition();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const filteredImages =
-    activeFilter === ALL_FILTER
-      ? images
-      : images.filter((img) => img.styleSlug === activeFilter);
+  const filteredImages = useMemo(
+    () =>
+      activeFilter === ALL_FILTER
+        ? images
+        : images.filter((img) => img.styleSlug === activeFilter),
+    [images, activeFilter],
+  );
+
+  const visibleImages = useMemo(
+    () => filteredImages.slice(0, visibleCount),
+    [filteredImages, visibleCount],
+  );
+
+  const hasMore = visibleCount < filteredImages.length;
+
+  // IntersectionObserver — carga siguiente batch cuando sentinel visible
+  useEffect(() => {
+    if (!hasMore) return;
+    const node = sentinelRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
+          setVisibleCount((c) => Math.min(c + batchSize, filteredImages.length));
+        }
+      },
+      { rootMargin: '600px 0px' }, // pre-carga 600px antes
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, batchSize, filteredImages.length]);
 
   function handleFilterChange(slug: string) {
     startTransition(() => {
       setActiveFilter(slug);
+      setVisibleCount(batchSize);
     });
   }
 
-  // Solo mostrar filtros si hay más de una categoría
   const showFilters = services.length > 1;
 
   return (
     <div>
-      {/* Filtros pills — scroll horizontal en mobile */}
+      {/* Filtros pills */}
       {showFilters && (
         <div
           role="tablist"
@@ -69,11 +96,9 @@ export function GalleryGrid({ images, services }: GalleryGridProps) {
           className={[
             'flex gap-2.5 overflow-x-auto pb-2',
             'snap-x snap-mandatory',
-            // Ocultar scrollbar en webkit
             '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]',
           ].join(' ')}
         >
-          {/* Pill "Todas" */}
           <button
             role="tab"
             aria-selected={activeFilter === ALL_FILTER}
@@ -109,37 +134,68 @@ export function GalleryGrid({ images, services }: GalleryGridProps) {
         </div>
       )}
 
-      {/* Grid masonry CSS columns */}
+      {/* Grid uniforme — aspect-square, sin reflow al append */}
       <div
         className={cn(
-          'mt-8 columns-2 gap-4 sm:gap-5 lg:columns-3 xl:columns-4 lg:gap-6',
-          // Fade when transitioning
+          'mt-8 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6',
           isPending ? 'opacity-60' : 'opacity-100',
           'transition-opacity duration-200',
         )}
         aria-live="polite"
         aria-busy={isPending}
       >
-        {filteredImages.length === 0 ? (
+        {visibleImages.length === 0 ? (
           <p className="col-span-full py-16 text-center font-sans text-base text-[var(--color-on-surface-variant)]">
             No hay imágenes en esta categoría todavía.
           </p>
         ) : (
-          filteredImages.map((image, index) => (
-            <div key={image.id} className="mb-4 sm:mb-5 lg:mb-6">
-              <GalleryItem
-                image={{
-                  url: image.url,
-                  alt: image.alt,
-                  caption: image.caption,
+          visibleImages.map((image, index) => {
+            const inBatchIndex = index % batchSize;
+            const isInitialBatch = index < batchSize;
+            return (
+              <div
+                key={`${activeFilter}-${image.id}`}
+                className="motion-safe:animate-gallery-in"
+                style={{
+                  animationDelay: `${inBatchIndex * 50}ms`,
+                  animationFillMode: 'both',
                 }}
-                sizes={GALLERY_SIZES}
-                priority={index < 4}
-              />
-            </div>
-          ))
+              >
+                <GalleryItem
+                  image={{
+                    url: image.url,
+                    alt: image.alt,
+                    caption: image.caption,
+                  }}
+                  sizes={GALLERY_SIZES}
+                  priority={isInitialBatch && index < 4}
+                />
+              </div>
+            );
+          })
         )}
       </div>
+
+      {/* Sentinel + indicador loading */}
+      {hasMore && (
+        <div
+          ref={sentinelRef}
+          className="mt-10 flex justify-center"
+          aria-hidden="true"
+        >
+          <div className="flex items-center gap-2 text-sm text-[var(--color-on-surface-variant)]">
+            <span className="inline-block h-3 w-3 rounded-full bg-primary motion-safe:animate-pulse" />
+            Cargando más fotos…
+          </div>
+        </div>
+      )}
+
+      {/* Counter footer cuando se ven todas */}
+      {!hasMore && filteredImages.length > batchSize && (
+        <p className="mt-10 text-center font-sans text-xs text-[var(--color-on-surface-variant)]">
+          {filteredImages.length} fotos
+        </p>
+      )}
     </div>
   );
 }

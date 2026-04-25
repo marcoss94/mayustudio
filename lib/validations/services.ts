@@ -88,7 +88,6 @@ export const styleSetSchema = z
     slug,
     description: optionalString,
     coverImage: z.string().url('URL inválida').optional().or(z.literal('')),
-    images: z.array(z.string().url('URL inválida')).max(10, 'Máximo 10 imágenes').default([]),
     standardPrice: price,
     premiumPrice: price,
     isCustom: z.boolean().default(false),

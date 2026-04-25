@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function CakeSmashPage() {
   const [style, galleryImages] = await Promise.all([
     getStyleBySlug('cake-smash'),
-    getGalleryImages('cake-smash'),
+    getGalleryImages({ styleSlug: 'cake-smash' }),
   ]);
 
   const sets = style?.sets.filter((s) => !s.isCustom) ?? [];

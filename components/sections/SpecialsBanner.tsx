@@ -64,7 +64,7 @@ export function SpecialsBanner({ specials, autoplayMs = 6000 }: SpecialsBannerPr
               priority={i === 0}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#3f2b22]/40 to-transparent" />
-            <div className="absolute inset-0 flex items-center px-8 md:px-12">
+            <div className="absolute inset-0 flex items-center pl-16 pr-16 md:pl-20 md:pr-20">
               <div className="text-white">
                 <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-2">
                   {special.badge || 'Especiales'}
@@ -85,17 +85,17 @@ export function SpecialsBanner({ specials, autoplayMs = 6000 }: SpecialsBannerPr
               type="button"
               onClick={prev}
               aria-label="Anterior"
-              className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[#3f2b22] hover:bg-white transition-all shadow-lg"
+              className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#3f2b22] hover:bg-white transition-all shadow-lg"
             >
-              <ChevronLeft className="w-5 h-5" strokeWidth={2} />
+              <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2} />
             </button>
             <button
               type="button"
               onClick={next}
               aria-label="Siguiente"
-              className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[#3f2b22] hover:bg-white transition-all shadow-lg"
+              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#3f2b22] hover:bg-white transition-all shadow-lg"
             >
-              <ChevronRight className="w-5 h-5" strokeWidth={2} />
+              <ChevronRight className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2} />
             </button>
 
             {/* Dots */}

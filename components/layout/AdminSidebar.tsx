@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Calendar,
   Scissors,
+  Image as ImageIcon,
   Users,
   CreditCard,
   LogOut,
@@ -20,6 +21,7 @@ const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/reservas', label: 'Reservas', icon: Calendar },
   { href: '/admin/servicios', label: 'Servicios', icon: Scissors },
+  { href: '/admin/galeria', label: 'Galería', icon: ImageIcon },
   { href: '/admin/clientes', label: 'Clientes', icon: Users },
   { href: '/admin/pagos', label: 'Pagos', icon: CreditCard },
 ];
@@ -33,10 +35,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <Link
           href="/admin"
           onClick={onNavigate}
-          className="flex items-center gap-2 font-serif text-lg italic font-semibold text-inverse-on-surface"
+          className="flex items-baseline gap-2 font-serif text-lg italic text-inverse-on-surface"
         >
           MayuStudio
-          <span className="rounded bg-primary/30 px-1.5 py-0.5 text-xs font-medium not-italic">
+          <span className="rounded bg-inverse-primary/20 px-1.5 py-0.5 font-sans not-italic text-[10px] uppercase tracking-[0.15em] text-inverse-primary">
             Admin
           </span>
         </Link>
@@ -55,13 +57,27 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   onClick={onNavigate}
                   aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-white/15 text-inverse-on-surface'
-                      : 'text-inverse-on-surface/70 hover:bg-white/10 hover:text-inverse-on-surface',
+                      ? 'bg-white/10 text-inverse-on-surface'
+                      : 'text-inverse-on-surface/65 hover:bg-white/8 hover:text-inverse-on-surface',
                   )}
                 >
-                  <Icon className="w-4 h-4" strokeWidth={1.75} />
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r-full bg-inverse-primary"
+                    />
+                  )}
+                  <Icon
+                    className={cn(
+                      'w-4 h-4 transition-colors',
+                      isActive
+                        ? 'text-inverse-primary'
+                        : 'text-inverse-on-surface/65 group-hover:text-inverse-on-surface',
+                    )}
+                    strokeWidth={1.75}
+                  />
                   {label}
                 </Link>
               </li>
@@ -77,7 +93,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             onNavigate?.();
             signOut({ callbackUrl: '/' });
           }}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-inverse-on-surface/70 transition-colors hover:bg-white/10 hover:text-inverse-on-surface"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-inverse-on-surface/65 transition-colors hover:bg-white/8 hover:text-inverse-on-surface"
         >
           <LogOut className="w-4 h-4" strokeWidth={1.75} />
           Cerrar sesión
@@ -110,7 +126,7 @@ export function AdminSidebar() {
         <SidebarContent />
       </aside>
 
-      {/* Mobile burger trigger (fixed top-left) */}
+      {/* Mobile burger trigger */}
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
@@ -134,7 +150,7 @@ export function AdminSidebar() {
               type="button"
               onClick={() => setMobileOpen(false)}
               aria-label="Cerrar menú"
-              className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-lg text-inverse-on-surface/70 hover:bg-white/10"
+              className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-lg text-inverse-on-surface/65 hover:bg-white/10 hover:text-inverse-on-surface"
             >
               <X className="w-5 h-5" strokeWidth={1.75} />
             </button>

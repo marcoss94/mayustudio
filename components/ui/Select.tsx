@@ -37,11 +37,11 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const hasError = Boolean(error);
 
     return (
-      <div className={cn('flex flex-col gap-1', containerClassName)}>
+      <div className={cn('flex flex-col gap-1.5', containerClassName)}>
         {label && (
           <label
             htmlFor={fieldId}
-            className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
+            className="text-xs font-medium uppercase tracking-wider text-on-surface-variant"
           >
             {label}
           </label>
@@ -53,12 +53,12 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             aria-invalid={hasError || undefined}
             aria-describedby={hasError ? `${fieldId}-error` : hint ? `${fieldId}-hint` : undefined}
             className={cn(
-              'w-full bg-transparent border-0 border-b py-2 pr-8 text-base text-on-surface appearance-none',
-              'focus:ring-0 focus:outline-none transition-colors cursor-pointer',
+              'w-full appearance-none rounded-lg border bg-surface-container-lowest px-3 py-2.5 pr-9 text-sm text-on-surface',
+              'transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer',
               hasError
                 ? 'border-error focus:border-error'
-                : 'border-outline-variant focus:border-secondary',
-              props.disabled && 'opacity-60 cursor-not-allowed',
+                : 'border-outline-variant hover:border-outline focus:border-primary',
+              props.disabled && 'opacity-60 cursor-not-allowed bg-surface-container',
               className,
             )}
             {...props}
@@ -75,7 +75,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
           <ChevronDown
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant pointer-events-none"
             strokeWidth={1.75}
           />
         </div>

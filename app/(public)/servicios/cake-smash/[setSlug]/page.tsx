@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, Palette, Sparkles, Check, X } from 'lucide-react';
 import { getStyleBySlug } from '@/lib/queries/services';
+import { getGalleryImages } from '@/lib/queries/gallery';
 import { formatCurrency } from '@/lib/utils';
 import { FAQ, HowItWorks } from '@/components/sections';
 import { CustomSetForm } from './CustomSetForm';
@@ -168,7 +169,11 @@ export default async function SetDetailPage({
   }
 
   // ─── Set regular (Standard + Premium) ──────────────────────────────
-  const images = set.images.slice(0, 6);
+  const galleryImages = await getGalleryImages({
+    styleSlug: 'cake-smash',
+    setSlug,
+  });
+  const images = galleryImages.slice(0, 6);
   const standardHighlights = style.tierStandardHighlights ?? [];
   const premiumHighlights = style.tierPremiumHighlights ?? [];
   const customSet = style.sets.find((s) => s.isCustom && s.isActive);
@@ -244,14 +249,14 @@ export default async function SetDetailPage({
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-            {images.map((url, i) => (
+            {images.map((img) => (
               <div
-                key={url}
+                key={img.id}
                 className="rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(63,43,34,0.06)]"
               >
                 <Image
-                  src={url}
-                  alt={`${set.name} - sesión ${i + 1}`}
+                  src={img.url}
+                  alt={img.alt}
                   width={400}
                   height={500}
                   className="w-full aspect-[4/5] object-cover"

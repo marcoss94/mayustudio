@@ -146,7 +146,6 @@ model StyleSet {
   slug          String
   description   String? @db.Text
   coverImage    String?
-  images        String[]
   standardPrice Decimal @db.Decimal(10, 2)
   premiumPrice  Decimal @db.Decimal(10, 2)
   isCustom      Boolean @default(false) // true = set personalizado (precio fijo, texto libre)
@@ -294,6 +293,7 @@ model GalleryImage {
   order     Int     @default(0)
   isVisible Boolean @default(true)
   styleSlug String? @db.VarChar(100) // filtrar por estilo
+  setSlug   String? @db.VarChar(100) // filtrar por set dentro de un estilo
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -301,4 +301,5 @@ model GalleryImage {
   @@index([isVisible, order])
   @@index([styleSlug])
   @@index([isVisible, styleSlug])
+  @@index([styleSlug, setSlug, isVisible, order])
 }

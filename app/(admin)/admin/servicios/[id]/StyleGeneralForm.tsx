@@ -4,11 +4,19 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { StyleForm } from '../StyleForm';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { EmbeddedGalleryManager } from '@/components/admin/EmbeddedGalleryManager';
 import { updateStyle } from '@/actions/services.actions';
 import type { StyleInput } from '@/lib/validations/services';
 import type { SerializedStyle } from './types';
+import type { GalleryImageRow, StyleWithSets } from '@/app/(admin)/admin/galeria/GalleryGrid';
 
-export function StyleGeneralForm({ style }: { style: SerializedStyle }) {
+export interface StyleGeneralFormProps {
+  style: SerializedStyle;
+  galleryImages: GalleryImageRow[];
+  styleSlugs: StyleWithSets[];
+}
+
+export function StyleGeneralForm({ style, galleryImages, styleSlugs }: StyleGeneralFormProps) {
   const router = useRouter();
   const [pendingSlugChange, setPendingSlugChange] = useState<StyleInput | null>(null);
 
@@ -67,9 +75,29 @@ export function StyleGeneralForm({ style }: { style: SerializedStyle }) {
     setPendingSlugChange(null);
   }
 
+  const generalImages = galleryImages.filter((i) => i.setSlug === null);
+
   return (
     <>
       <StyleForm mode="edit" initialData={initial} onSubmit={handleSubmit} />
+
+      <section className="mt-10 pt-8 border-t border-outline-variant/20">
+        <header className="mb-4">
+          <h3 className="font-serif text-lg italic text-on-surface">Galería del estilo</h3>
+          <p className="mt-0.5 text-sm text-on-surface-variant">
+            Fotos generales del estilo — no asociadas a un set específico. Aparecen en /galeria y /servicios/{style.slug}.
+          </p>
+        </header>
+        <EmbeddedGalleryManager
+          styleSlug={style.slug}
+          setSlug={null}
+          enabled={true}
+          images={generalImages}
+          styleSlugs={styleSlugs}
+          emptyMessage="Sin fotos generales del estilo todavía."
+        />
+      </section>
+
       <ConfirmDialog
         open={pendingSlugChange !== null}
         onClose={() => setPendingSlugChange(null)}
